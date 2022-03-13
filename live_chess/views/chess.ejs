@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta id="viewport" name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+		<meta name="apple-mobile-web-app-title" content="chess-game">
+		<meta name="application-name" content="chess-game">
+		<meta name="msapplication-TileColor" content="#2b5797">
+		<meta name="apple-mobile-web-app-status-bar-style" content="default">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="theme-color" content="#ffffff">
+		<title><%= title %> | Chess Game</title>
+		<link rel='stylesheet' href='/stylesheets/style.css' />
+	</head>
+	<body>
+		<div class="window-c">
+			<div class="turn-window">
+				<h1 id="turn-window-tt">Waiting...</h1>
+			</div>
+		</div>
+
+		<div class="b-rm-p"></div>
+		<div class="w-rm-p"></div>
+
+		<div class="timer-pan">
+			<h1 id="play-timer"></h1>
+		</div>
+
+		<div class="app-root" id="app-root"></div>
+
+		<% if(type == "local") { %>
+			<script defer src="/javascripts/chess.js"></script>
+		<% } else if (type == "online") { %> 
+			<script defer src="/javascripts/chess_online.js"></script>
+		<% } %> 
+
+	</body>
+</html>
