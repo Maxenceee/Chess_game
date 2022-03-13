@@ -1111,7 +1111,8 @@ this.gref_ = this.gref_ || {};
         };
 
         _.openWS = () => {
-            this.socket = new WebSocket("ws://localhost:8080");
+            console.log("ws://"+location.hostname+":8080");
+            this.socket = new WebSocket("ws://"+location.hostname+":8080");
 
             this.chessRoot = _.getElemID(Kd[0]);
             this.loader = _.addLoader(this.chessRoot);
