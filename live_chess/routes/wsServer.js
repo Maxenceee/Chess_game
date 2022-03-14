@@ -37,11 +37,11 @@ wss.on('connection', async function(ws) {
             CLIENTS[newPlayer-1].send(JSON.stringify({pawnPromise : {coord: res.pawnPromise.coord, piece: res.pawnPromise.piece, removedPieces: res.pawnPromise.removedPieces}}));
         }
         if (res.isReady) {
-            console.log(res.isReady);
+            console.log("isReady", res.isReady);
             playerReady.push(res.player);
             console.log(playerReady);
             if (playerReady.length == 2) {
-                console.log("all ready");
+                console.log("all ready", "\ngame start");
                 sendAll(JSON.stringify({startingPlayer: 1}));
             }
         }
@@ -54,7 +54,7 @@ wss.on('connection', async function(ws) {
         sendAll(JSON.stringify({USER_DISCONNECTED: ws.id}));
     });
 
-    console.log(ws.id);
+    console.log(ws.id, "connected");
 
     sendAll(JSON.stringify({NEW_USER_JOINED: ws.id}));
     sendAll(JSON.stringify({gameStart: CLIENTS.length == 2}));
