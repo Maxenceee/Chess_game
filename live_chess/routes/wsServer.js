@@ -51,15 +51,17 @@ wss.on('connection', async function(ws) {
         console.log(ws.id+" disconnected");
 
         removeClient(ws.id);
+        console.log("number of client", CLIENTS.length);
         sendAll(JSON.stringify({USER_DISCONNECTED: ws.id}));
     });
-
+    
     console.log(ws.id, "connected");
-
+    
     sendAll(JSON.stringify({NEW_USER_JOINED: ws.id}));
     sendAll(JSON.stringify({gameStart: CLIENTS.length == 2}));
-
+    
     if (CLIENTS.length == 2) initGame();
+    console.log("number of client", CLIENTS.length);
 });
 
 function initGame() {
@@ -98,6 +100,7 @@ async function removeClient(id) {
         
             if (foundId >= 0) {
                 CLIENTS.splice(foundId, 1);
+                playerReady = [];
                 resolve(1)
             } else {
                 reject(0)

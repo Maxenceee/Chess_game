@@ -744,10 +744,17 @@ this.gref_ = this.gref_ || {};
 
             this.piecesBoard = new Array(8).fill(0).map(() => new Array(8).fill(0));
 
+            window.onresize = () => { _.resiseTable() };
+
             setTimeout(() => {
                 this.table.classList.add("-show");
             }, 500);
             // console.log(this.piecesBoard);
+        };
+
+        _.resiseTable = () => {
+            let tableSize = Math.min(window.innerWidth, window.innerHeight)*0.95;
+            this.table.style.width = this.table.style.height = tableSize+"px";
         };
 
         _.movePiece = (a, b) => {
@@ -997,9 +1004,14 @@ this.gref_ = this.gref_ || {};
             if (!b) {
                 l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div id="ad-err-close-btn" class="ad-err-close">Fermer</div></div>';
             } else {
-                l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div class="ad-btn"><div id="ad-err-reset-btn" class="ad-err-close ad-demi ad-demi-sup">'+a+'</div><div id="ad-err-close-btn" class="ad-err-close ad-demi">'+c+'</div></div></div>';
-                document.getElementById('ad-err-reset-btn').addEventListener("click", b);
-                document.getElementById('ad-err-reset-btn').addEventListener("click", function() {document.body.removeChild(l)});
+                if (c) {
+                    l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div class="ad-btn"><div id="ad-err-reset-btn" class="ad-err-close ad-demi ad-demi-sup">'+a+'</div><div id="ad-err-close-btn" class="ad-err-close ad-demi">'+c+'</div></div></div>';
+                    document.getElementById('ad-err-reset-btn').addEventListener("click", b);
+                    document.getElementById('ad-err-reset-btn').addEventListener("click", function() {document.body.removeChild(l)});
+                } else {
+                    l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div id="ad-err-close-btn" class="ad-err-close">'+a+'</div></div>';
+                    document.getElementById('ad-err-close-btn').addEventListener("click", b);
+                }
             }
             if (d) {
                 document.getElementById('ad-err-close-btn').addEventListener("click", d);

@@ -710,3 +710,38 @@ body {
 	  box-shadow: 9984px 0 0 0 #fff, 9999px 0 0 0 #fff, 10014px 0 0 0 #fff;
 	}
 }
+
+@media screen and (max-width: 800px) {
+	.timer-pan {
+		bottom: 20px;
+		left: 20px;
+		padding: 10px;
+	}
+	
+	.timer-pan h1 {
+		font-size: 1em;
+	}
+
+	.window-c {
+		width: 80%;
+		left: 10%;
+		display: flex;
+		flex-direction: column;
+		flex-wrap: wrap;
+	}
+
+	.turn-window, .info-window, .wait-pan {
+		width: 150px;
+		padding: 10px;
+		margin: 10px 0;
+	}
+
+	.turn-window h1, .info-window h1, .wait-pan h1 {
+		font-size: 1em;
+	}
+
+	.w-rm-p, .b-rm-p {
+		right: 10px;
+		width: 50%;
+	}
+}
