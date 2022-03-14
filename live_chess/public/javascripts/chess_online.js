@@ -1112,7 +1112,7 @@ this.gref_ = this.gref_ || {};
 
         _.openWS = () => {
             console.log("ws://"+location.hostname+":8080");
-            this.socket = new WebSocket("ws://"+location.hostname);
+            this.socket = new WebSocket("ws://"+location.hostname+"/game");
 
             this.chessRoot = _.getElemID(Kd[0]);
             this.loader = _.addLoader(this.chessRoot);
