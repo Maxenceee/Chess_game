@@ -1,4 +1,4 @@
 live_chess/node_modules
-live_chess/node_modules
-ws_server/package-lock.json
+ws_server/node_modules
+live_chess/package-lock.json
 ws_server/package-lock.json
