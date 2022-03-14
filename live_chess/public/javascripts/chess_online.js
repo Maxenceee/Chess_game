@@ -746,6 +746,10 @@ this.gref_ = this.gref_ || {};
 
             window.onresize = () => { _.resiseTable() };
 
+            _.ischeck();
+
+            this.waitingPan && this.waitingPan.remove();
+
             setTimeout(() => {
                 this.table.classList.add("-show");
             }, 500);

@@ -725,6 +725,7 @@ body {
 	.window-c {
 		width: 80%;
 		left: 10%;
+		max-height: 200px;
 		display: flex;
 		flex-direction: column;
 		flex-wrap: wrap;
@@ -743,5 +744,6 @@ body {
 	.w-rm-p, .b-rm-p {
 		right: 10px;
 		width: 50%;
+		display: none;
 	}
 }
