@@ -734,7 +734,7 @@ body {
 	.turn-window, .info-window, .wait-pan {
 		width: 150px;
 		padding: 10px;
-		margin: 10px 0;
+		margin: 5px 0;
 	}
 
 	.turn-window h1, .info-window h1, .wait-pan h1 {

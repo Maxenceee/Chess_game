@@ -698,10 +698,7 @@ this.gref_ = this.gref_ || {};
         };
 
         _.didPawnGetPromise = (a, b) => {
-            if (a.y == 0 && this.playerColor == b && this.removedPieces[b].length > 0) {
-                console.log("white promise");
-                _.pawnPromisePanel(b, a);
-            }
+            return (a.y == 0 && this.playerColor == b && this.removedPieces[b].length > 0)
         };
 
         _.placePieces = (a, b) => {
@@ -815,7 +812,14 @@ this.gref_ = this.gref_ || {};
                     this.piecesBoard[oldCell.x][oldCell.y] = 0;
                     this.isWTurn = !this.isWTurn;
 
-                    (pieceType == "pawn" && _.didPawnGetPromise(newCell, this.piecesBoard[newCell.x][newCell.y].color));
+                    if (pieceType == "pawn" && _.didPawnGetPromise(newCell, this.piecesBoard[newCell.x][newCell.y].color)) {
+                        console.log("white promise");
+                        _.pawnPromisePanel(this.piecesBoard[newCell.x][newCell.y].color, newCell, oldCell, newCell);
+                    } else {
+                        console.log("is not pawn promise");
+                        _.pushGameChanges(oldCell, newCell);
+                        _.checkForKingCheck();
+                    }
 
                     /*
                         Logs
@@ -824,9 +828,7 @@ this.gref_ = this.gref_ || {};
                     console.log(this.piecesBoard);
 
                     console.info("piece moved");
-                    _.checkForKingCheck();
 
-                    _.pushGameChanges(oldCell, newCell);
                 }
 
                 // console.info(kingM.chec.length, kingM.empty.length);
@@ -844,14 +846,14 @@ this.gref_ = this.gref_ || {};
 
             if (W.chec.length > 0 && W.empty.length <= 0 && !eW) {
                 console.info("check mate W");
-                this.gamePlaying = false;
                 // alert("Black Player Win");
                 _.ischeck(W.chec, "W", true);
+                _.endGame('W');
             } else if (B.chec.length > 0 && B.empty.length <= 0 && !eB) {
                 console.info("check mate B");
-                this.gamePlaying = false;
                 // alert("White Player Win");
                 _.ischeck(B.chec, "B", true);
+                _.endGame('B');
             } else if (W.chec.length > 0) {
                 console.info("check W", W.chec);
                 _.ischeck(W.chec, "W");
@@ -876,7 +878,16 @@ this.gref_ = this.gref_ || {};
             }
         };
 
-        _.pawnPromisePanel = (a, b) => {
+        _.endGame = (a) => {
+            this.gamePlaying = false;
+            clearInterval(this.playerTimer);
+            this.waitingPan && this.waitingPan.remove();
+            this.popupAlert = _.alertPopup((a == 'W' ? "White" : "Black")+" player win the game!", "Go Home", function() {
+                window.location.href = "/";
+            }, "Stay here");
+        };
+
+        _.pawnPromisePanel = (a, b, e, f) => {
             if (this.removedPieces[a]) {
                 let p = _.creatElem({attr: {id: "pawn-promise-panel", class: "pawn-promise-panel"}}),
                     q = _.creatElem({naAttr: "pawn-promise-panel-c"});
@@ -890,12 +901,13 @@ this.gref_ = this.gref_ || {};
                     d.splice(c, 1);
                     p.remove();
                     _.updateRemovedPieceDisplay();
-                    _.checkForKingCheck();
+                    _.pushGameChanges(e, f);
                     _.pushPawnPromise(a, b);
+                    _.checkForKingCheck();
                 }
     
                 this.removedPieces[a].forEach((t, i) => {
-                    let j = _.creatElem({attr: {class: "pawn-prom-p-c-itm", style: "--delay-itm: "+i/10+"s;", id: "pawn-prom-p-c-itm-"+i}});
+                    let j = _.creatElem({attr: {class: "pawn-prom-p-c-itm", style: "--delay-itm: "+i/15+"s;", id: "pawn-prom-p-c-itm-"+i}});
                     j.style.backgroundImage = 'url(/images/'+t.img+')';
                     j.onclick = (function() {
                         x(b, t, i, this.removedPieces[a]);
@@ -923,7 +935,14 @@ this.gref_ = this.gref_ || {};
             });
         };
 
+        _.clearRemovedPieceDisplay = () => {
+            _.getElemCl("w-rm-p").innerHTML = "";
+            _.getElemCl("b-rm-p").innerHTML = "";
+        };
+
         _.placeRemovePrev = () => {
+            _.getElemCl("w-rm-p").style = "";
+            _.getElemCl("b-rm-p").style = "";
             if (this.playerColor === 'W') {
                 _.getElemCl("w-rm-p").style.bottom = "50px";
                 _.getElemCl("b-rm-p").style.top = "50px";
@@ -1083,6 +1102,7 @@ this.gref_ = this.gref_ || {};
             _.defChessImage(_.getCell(nx, ny), this.piecesBoard[nx][ny].img);
             this.removedPieces = a.removedPieces;
             _.updateRemovedPieceDisplay();
+            _.checkForKingCheck();
         };
 
         _.updateChanges = (a) => {
@@ -1126,6 +1146,17 @@ this.gref_ = this.gref_ || {};
             console.log(this.piecesBoard);
         };
 
+        _.onUserDisconnecion = () => {
+            this.table && this.table.remove();
+            this.waitingPan && this.waitingPan.remove();
+            this.loader = _.addLoader(this.chessRoot);
+            this.playerTimer && clearInterval(this.playerTimer);
+            _.clearRemovedPieceDisplay();
+            this.popupAlert = _.alertPopup("The other player just disconnected", "Go Home", function() {
+                window.location.href = "/";
+            }, "Wait here");
+        };
+
         _.openWS = () => {
             console.log("ws://"+location.hostname+":8080");
             this.socket = new WebSocket("ws://"+location.hostname+":8080");
@@ -1151,15 +1182,9 @@ this.gref_ = this.gref_ || {};
                     if (msg.pawnPromise) _.updateFromPromise(msg.pawnPromise);
                     if (msg.player) _.initGame(msg.player1Color, msg.player2Color, msg.player);
                     if (msg.startingPlayer) _.PLayerTurn(msg.startingPlayer), _.initTimer();
-                    if (msg.USER_DISCONNECTED) {
-                        this.table && this.table.remove();
-                        this.loader = _.addLoader(this.chessRoot);
-                        this.popupAlert = _.alertPopup("The other player just disconnected", "Go Home", function() {
-                            window.location.href = "/";
-                        }, "Wait here");
-                    }
+                    if (msg.USER_DISCONNECTED) _.onUserDisconnecion();
                     if (msg.gameStart) {
-                        this.popupAlert && this.popupAlert.remove();
+                        (this.popupAlert || (this.popupAlert = _.getElemID("ad-error-pn-c"))) && this.popupAlert.remove();
                     }
                 } catch (error) {
                     console.log(error);
