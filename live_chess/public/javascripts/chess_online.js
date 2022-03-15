@@ -867,6 +867,9 @@ this.gref_ = this.gref_ || {};
         };
 
         _.ischeck = (c, a, b) => {
+            if (_.getElemCl("info-window")) {
+                _.getElemCl("info-window").remove();
+            }
             if (a) {
                 this.checkPanel = _.creatElem({naAttr: "info-window"});
                 let ln = _.creatElem({type: "h1", naAttr: "info-window-t2"});
@@ -957,6 +960,7 @@ this.gref_ = this.gref_ || {};
         };
 
         _.PLayerTurn = (a) => {
+            console.log("player turn");
             this.playerTurn = a;
             this.gamePlaying = true;
             (this.playerTurn === this.player) && (this.canPLay = true)
@@ -971,7 +975,6 @@ this.gref_ = this.gref_ || {};
             let linterval = window.setInterval(function() {
                 if (i >= Object.getOwnPropertyNames(PW).length+Object.getOwnPropertyNames(PB).length) {
                     clearInterval(linterval);
-                    _.debugDisplay();
                     return;
                 };
 
@@ -982,6 +985,7 @@ this.gref_ = this.gref_ || {};
 
         _.initGame = (a, b, c) => {
             this.loader.remove();
+            this.isReady = true;
             this.selectedPiece = false;
             this.playerTurn = 0;
             this.gamePlaying = false;
@@ -1045,7 +1049,7 @@ this.gref_ = this.gref_ || {};
 
         _.connectioTimout = () => {
             setTimeout(() => {
-                if (!this.gamePlaying) {
+                if (!this.gamePlaying && !this.isReady) {
                     this.popupAlert = _.alertPopup("Oops...There's nobody to play with here", "Go Home", () => {
                         window.location.href = "/";
                     }, "Try again", () => {_.connectioTimout()});
@@ -1054,6 +1058,9 @@ this.gref_ = this.gref_ || {};
         };
 
         _.waitingAnim = () => {
+            if (_.getElemID("wait-pan")) {
+                return _.getElemID("wait-pan");
+            }
             let ld = _.creatElem({attr: {id: "wait-pan", class: "wait-pan"}}),
                 lh = _.creatElem({type: "h1", naAttr: "wait-pan-c"});
             ld.appendChild(lh);
@@ -1177,17 +1184,18 @@ this.gref_ = this.gref_ || {};
                     let msg = JSON.parse(message.data);
                     console.log(msg);
 
+                    if (msg.player) _.initGame(msg.player1Color, msg.player2Color, msg.player);
+                    if (msg.startingPlayer) _.PLayerTurn(msg.startingPlayer), _.initTimer();
+                    if (msg.gameStart) {
+                        (this.popupAlert || (this.popupAlert = _.getElemID("ad-error-pn-c"))) && this.popupAlert.remove();
+                    }
+
                     if (msg.changesCoord) {
                         _.updateChanges(msg); 
                         this.waitingPan && this.waitingPan.remove();
                     };
                     if (msg.pawnPromise) _.updateFromPromise(msg.pawnPromise);
-                    if (msg.player) _.initGame(msg.player1Color, msg.player2Color, msg.player);
-                    if (msg.startingPlayer) _.PLayerTurn(msg.startingPlayer), _.initTimer();
                     if (msg.USER_DISCONNECTED) _.onUserDisconnecion();
-                    if (msg.gameStart) {
-                        (this.popupAlert || (this.popupAlert = _.getElemID("ad-error-pn-c"))) && this.popupAlert.remove();
-                    }
                 } catch (error) {
                     console.log(error);
                 }

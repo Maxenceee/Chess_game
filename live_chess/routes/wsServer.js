@@ -7,100 +7,141 @@ var uuid = require('node-uuid');
 
 let wss = new WebSocket.Server({ port:'8080' }),
     CLIENTS=[],
-    GAME_INITIALIZED = false,
-    playerReady = [];
+    WAITINGPLAYERS = [];
 
 wss.on('connection', async function(ws) {
     ws.id = uuid.v4();
-    let mc = await manageClient(ws);
+    // let mc = await manageClient(ws);
 
-    ws.send(JSON.stringify({"connection accepted": mc}));
+    ws.send(JSON.stringify({"connection accepted": true}));
 
-    if (!mc) {
-        ws.send(JSON.stringify({reason: "max user reached"}));
-        ws.close()
-        return
-    }
+    // if (!mc) {
+    //     ws.send(JSON.stringify({reason: "max user reached"}));
+    //     ws.close()
+    //     return
+    // }
 
-    ws.on('message', function(message) {
+    ws.on('message', async function(message) {
         console.log('received: %s', message);
         // sendAll(JSON.stringify({message: message}));
+        let op = await getOpponent(ws);
+
         let res = JSON.parse(message);
         if (res.changesCoord) {
             let newPlayer = res.playerTurn === 1 ? 2 : 1,
                 newmsg = JSON.stringify({changesCoord: res.changesCoord, playerTurn: newPlayer, removedPieces: res.removedPieces});
 
-            CLIENTS[newPlayer-1].send(newmsg);
+            op.send(newmsg);
         }
         if (res.pawnPromise) {
-            let newPlayer = res.pawnPromise.origin === 1 ? 2 : 1;
-            CLIENTS[newPlayer-1].send(JSON.stringify({pawnPromise : {coord: res.pawnPromise.coord, piece: res.pawnPromise.piece, removedPieces: res.pawnPromise.removedPieces}}));
+            op.send(JSON.stringify({pawnPromise : {coord: res.pawnPromise.coord, piece: res.pawnPromise.piece, removedPieces: res.pawnPromise.removedPieces}}));
         }
         if (res.isReady) {
-            console.log("isReady", res.isReady);
-            playerReady.push(res.player);
-            console.log(playerReady);
-            if (playerReady.length == 2) {
-                console.log("all ready", "\ngame start");
-                sendAll(JSON.stringify({startingPlayer: 1}));
+            console.log("isReady", res.isReady, ws.id, ws.opponent);
+            ws.isReady = true;
+
+            console.log(ws.isReady, op.isReady);
+            if (ws.isReady && op.isReady) {
+                console.log("all ready", "\ngame start\n");
+                ws.send(JSON.stringify({startingPlayer: 1}));
+                op.send(JSON.stringify({startingPlayer: 1}));
             }
         }
     });
 
-    ws.on('close', function(message) {
-        console.log(ws.id+" disconnected");
+    ws.on('close', async function(message) {
+        console.log(ws.id, "disconnected");
 
-        removeClient(ws.id);
+        removeClient(ws.id, CLIENTS);
+        removeClient(ws.id, WAITINGPLAYERS);
         console.log("number of client", CLIENTS.length);
-        sendAll(JSON.stringify({USER_DISCONNECTED: ws.id}));
+        let op = await clientByOpponent(ws.id);
+        console.log(op == 0 );
+        if (op != 0) {
+            op.send(JSON.stringify({USER_DISCONNECTED: ws.id}));
+            WAITINGPLAYERS.push(op);
+        }
     });
     
-    console.log(ws.id, "connected");
+    console.log({NEW_USER_JOINED: ws.id});
+    // sendAll(JSON.stringify({gameStart: CLIENTS.length == 2}));
     
-    sendAll(JSON.stringify({NEW_USER_JOINED: ws.id}));
-    sendAll(JSON.stringify({gameStart: CLIENTS.length == 2}));
-    
-    if (CLIENTS.length == 2) initGame();
-    console.log("number of client", CLIENTS.length);
+    // if (CLIENTS.length == 2) initGame();
+    clientConnection(ws);
 });
 
-function initGame() {
-    if (!GAME_INITIALIZED) {
-        CLIENTS[0].send(JSON.stringify({player1Color: 'W', player2Color: 'B', player: 1}));
-        CLIENTS[1].send(JSON.stringify({player1Color: 'B', player2Color: 'W', player: 2}));
+function clientConnection(a) {
+    WAITINGPLAYERS.push(a);
+    console.log("new waiting", a.id);
+    CLIENTS.push(a);
+    console.log("number of client", CLIENTS.length);
+    if (WAITINGPLAYERS.length == 2) {
+        initGame(WAITINGPLAYERS);
+        WAITINGPLAYERS = [];
     }
 }
 
-async function manageClient(client) {
+function initGame(CL) {
+    console.log("init game");
+    CL[0].opponent = CL[1].id;
+    CL[1].opponent = CL[0].id;
+    CL[0].send(JSON.stringify({player1Color: 'W', player2Color: 'B', player: 1}));
+    CL[1].send(JSON.stringify({player1Color: 'B', player2Color: 'W', player: 2}));
+}
+
+async function getOpponent(a) {
     try {
+        // console.log("get opponent of",a.id);
         let response = await new Promise((resolve, reject) => {
-            if (CLIENTS.length >= 2) {
-                reject(0);
+            var foundId = CLIENTS.findIndex(function (obj) {
+                return obj.id == a.opponent;
+            });
+        
+            if (foundId >= 0) {
+                resolve(CLIENTS[foundId])
             } else {
-                console.log("add",client.id);
-                client.ord = CLIENTS.length == 0 ? 0 : 1
-                CLIENTS.push(client);
-                resolve(1)
+                reject(0)
             }
         });
-    
-        return response === 1 ? true : false   
+
+        return response
     } catch (error) {
         console.log(error);
     }
 }
 
-async function removeClient(id) {
+async function clientByOpponent(a) {
+    try {
+        // console.log("get opponent of",a.id);
+        let response = await new Promise((resolve, reject) => {
+            var foundId = CLIENTS.findIndex(function (obj) {
+                return obj.opponent == a;
+            });
+        
+            if (foundId >= 0) {
+                resolve(CLIENTS[foundId])
+            } else {
+                reject(0)
+            }
+        });
+
+        return response !== 0 ? response : a
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function removeClient(id, l) {
     try {
         console.log("remove",id);
         let response = await new Promise((resolve, reject) => {
-            var foundId = CLIENTS.findIndex(function (obj) {
+            var foundId = l.findIndex(function (obj) {
                 return obj.id == id;
             });
         
             if (foundId >= 0) {
-                CLIENTS.splice(foundId, 1);
-                playerReady = [];
+                l.splice(foundId, 1);
+                PLAYERSREADY = [];
                 resolve(1)
             } else {
                 reject(0)
