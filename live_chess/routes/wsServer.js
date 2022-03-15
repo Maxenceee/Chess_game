@@ -56,17 +56,14 @@ wss.on('connection', async function(ws) {
         removeClient(ws.id, WAITINGPLAYERS);
         console.log("number of client", CLIENTS.length);
         let op = await clientByOpponent(ws.id);
-        console.log(op == 0 );
-        if (op != 0) {
+        console.log("op", op);
+        if (op && op != 0) {
             op.send(JSON.stringify({USER_DISCONNECTED: ws.id}));
             WAITINGPLAYERS.push(op);
         }
     });
     
     console.log({NEW_USER_JOINED: ws.id});
-    // sendAll(JSON.stringify({gameStart: CLIENTS.length == 2}));
-    
-    // if (CLIENTS.length == 2) initGame();
     clientConnection(ws);
 });
 
@@ -98,13 +95,13 @@ async function getOpponent(a) {
             });
         
             if (foundId >= 0) {
-                resolve(CLIENTS[foundId])
+                resolve(CLIENTS[foundId]);
             } else {
-                reject(0)
+                reject(0);
             }
         });
 
-        return response
+        return response !== 0 ? response : a
     } catch (error) {
         console.log(error);
     }
@@ -119,13 +116,13 @@ async function clientByOpponent(a) {
             });
         
             if (foundId >= 0) {
-                resolve(CLIENTS[foundId])
+                resolve(CLIENTS[foundId]);
             } else {
-                reject(0)
+                reject(0);
             }
         });
 
-        return response !== 0 ? response : a
+        return response === 0 ? false : response
     } catch (error) {
         console.log(error);
     }
@@ -142,9 +139,9 @@ async function removeClient(id, l) {
             if (foundId >= 0) {
                 l.splice(foundId, 1);
                 PLAYERSREADY = [];
-                resolve(1)
+                resolve(1);
             } else {
-                reject(0)
+                reject(0);
             }
         });
 
