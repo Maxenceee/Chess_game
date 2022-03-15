@@ -811,6 +811,7 @@ this.gref_ = this.gref_ || {};
                     console.log(this.piecesBoard);
 
                     console.info("piece moved");
+                    _.ischeck();
                     _.checkForKingCheck();
                 }
 
