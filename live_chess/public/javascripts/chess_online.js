@@ -1091,6 +1091,7 @@ this.gref_ = this.gref_ || {};
         };
 
         _.updateFromPromise = (a) => {
+            _.ischeck();
             console.log(a);
             let ox = a.coord.x,
                 oy = a.coord.y,
@@ -1106,6 +1107,7 @@ this.gref_ = this.gref_ || {};
         };
 
         _.updateChanges = (a) => {
+            _.ischeck();
             console.log(a);
             console.log(this.playerTurn, this.canPLay);
             let oldCell = a.changesCoord.oldCoord,
