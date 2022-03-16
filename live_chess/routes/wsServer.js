@@ -13,7 +13,7 @@ wss.on('connection', async function(ws) {
     ws.id = uuid.v4();
     // let mc = await manageClient(ws);
 
-    ws.send(JSON.stringify({"connection accepted": true}));
+    ws.send(JSON.stringify({"CONNECTION_ACCEPTED": true}));
 
     // if (!mc) {
     //     ws.send(JSON.stringify({reason: "max user reached"}));
