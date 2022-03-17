@@ -885,7 +885,7 @@ this.gref_ = this.gref_ || {};
             this.gamePlaying = false;
             clearInterval(this.playerTimer);
             this.waitingPan && this.waitingPan.remove();
-            this.popupAlert = _.alertPopup((a == 'W' ? "White" : "Black")+" player win the game!", "Go Home", function() {
+            this.popupAlert = _.alertPopup((a == this.playerColor ? this.username : this.opponentUsername)+" player win the game!", "Go Home", function() {
                 window.location.href = "/";
             }, "Stay here");
         };
@@ -961,10 +961,10 @@ this.gref_ = this.gref_ || {};
 
         _.PLayerTurn = (a) => {
             console.log("player turn");
-            this.playerTurn = a;
+            this.playerTurn = a.startingPlayer;
             this.gamePlaying = true;
             (this.playerTurn === this.player) && (this.canPLay = true)
-            this.player == 2 && (this.waitingPan = _.waitingAnim());
+            this.opponentUsername = a.opponentUsername;
             _.debugDisplay();
         };
 
@@ -1010,9 +1010,25 @@ this.gref_ = this.gref_ || {};
                 _.placePieces(_.PIECES[this.playerColor], P1);
                 _.placePieces(_.PIECES[this.otherPLayerColor], P2);
 
-                _.showPieces();
-                this.socket.send(JSON.stringify({isReady: true, player: this.player}));
+                this.popupAlert = _.usernamePopup("Choose your username", () => {
+                    this.username = _.getElemID('on-user-input').value;
+                    this.socket.send(JSON.stringify({isReady: true, player: this.player, username: this.username}));
+                    _.showPieces();
+                });
             }, 1500);
+        };
+
+        _.usernamePopup = (t, a) => {
+            this.popupAlert && this.popupAlert.remove();
+            let l = document.createElement('div');
+            l.classList.add('ad-error-pn-c');
+            document.body.appendChild(l);
+            l.innerHTML = '<div class="ad-error-panel grow-anim"><div class="ad-err"><p style="min-height: auto;">'+t+'</p><div class="fr-text-field"><input required maxlength="15" type="text" id="on-user-input" class="SIU-tf"><label for="name" class="label-name"><span class="content-name">Username</span></label></div></div><div id="ad-err-close-btn" class="ad-err-close">Save</div></div>';
+            if (a) {
+                document.getElementById('ad-err-close-btn').addEventListener("click", a);
+            }
+            document.getElementById('ad-err-close-btn').addEventListener("click", function() {document.body.removeChild(l)});
+            return l
         };
 
         _.addLoader = (r) =>  {
@@ -1025,6 +1041,7 @@ this.gref_ = this.gref_ || {};
         }
 
         _.alertPopup = (t, a, b, c, d) => {
+            this.popupAlert && this.popupAlert.remove();
             let l = document.createElement('div');
             l.classList.add('ad-error-pn-c');
             document.body.appendChild(l);
@@ -1064,7 +1081,7 @@ this.gref_ = this.gref_ || {};
             let ld = _.creatElem({attr: {id: "wait-pan", class: "wait-pan"}}),
                 lh = _.creatElem({type: "h1", naAttr: "wait-pan-c"});
             ld.appendChild(lh);
-            lh.innerText = "Player "+(this.player === 1 ? 2 : 1)+" is playing";
+            lh.innerText = this.opponentUsername+" is playing";
             ld.appendChild(_.creatElem({naAttr: "dot-typing"}));
             _.getElemCl("window-c").appendChild(ld);
             return ld;
@@ -1082,6 +1099,7 @@ this.gref_ = this.gref_ || {};
                 this.timerPan.innerText = (Math.floor(this.selfTimerCount/60)+"'"+this.selfTimerCount%60+"\"")+":"+(Math.floor(this.otherTimerCount/60)+"'"+this.otherTimerCount%60+"\"")
                 if (!this.gamePlaying) clearInterval(this.playerTimer);
             }, 1000);
+            this.player == 2 && (this.waitingPan = _.waitingAnim());
         };
 
         _.pushGameChanges = (a, b) => {
@@ -1185,7 +1203,7 @@ this.gref_ = this.gref_ || {};
                     console.log(msg);
 
                     if (msg.player) _.initGame(msg.player1Color, msg.player2Color, msg.player);
-                    if (msg.startingPlayer) _.PLayerTurn(msg.startingPlayer), _.initTimer();
+                    if (msg.startingPlayer) _.PLayerTurn(msg), _.initTimer();
                     if (msg.gameStart) {
                         (this.popupAlert || (this.popupAlert = _.getElemID("ad-error-pn-c"))) && this.popupAlert.remove();
                     }
@@ -1203,6 +1221,7 @@ this.gref_ = this.gref_ || {};
 
             this.socket.onclose = () => {
                 this.table && this.table.remove();
+                this.popupAlert && this.popupAlert.remove();
                 this.loader = _.addLoader(this.chessRoot);
                 setTimeout(() => {
                     window.location.href = "/";

@@ -38,13 +38,14 @@ wss.on('connection', async function(ws) {
         }
         if (res.isReady) {
             console.log("isReady", res.isReady, ws.id, ws.opponent);
-            ws.isReady = true;
+            ws.isReady = res.isReady;
+            ws.username = res.username;
 
             console.log(ws.isReady, op.isReady);
             if (ws.isReady && op.isReady) {
                 console.log("all ready", "\ngame start\n");
-                ws.send(JSON.stringify({startingPlayer: 1}));
-                op.send(JSON.stringify({startingPlayer: 1}));
+                ws.send(JSON.stringify({startingPlayer: 1, opponentUsername: op.username}));
+                op.send(JSON.stringify({startingPlayer: 1, opponentUsername: ws.username}));
             }
         }
     });
