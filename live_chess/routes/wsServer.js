@@ -11,19 +11,12 @@ let wss = new WebSocket.Server({ port:'8080' }),
 
 wss.on('connection', async function(ws) {
     ws.id = uuid.v4();
-    // let mc = await manageClient(ws);
 
     ws.send(JSON.stringify({"CONNECTION_ACCEPTED": true}));
 
-    // if (!mc) {
-    //     ws.send(JSON.stringify({reason: "max user reached"}));
-    //     ws.close()
-    //     return
-    // }
-
     ws.on('message', async function(message) {
         console.log('received: %s', message);
-        // sendAll(JSON.stringify({message: message}));
+
         let op = await getOpponent(ws);
 
         let res = JSON.parse(message);
@@ -41,7 +34,6 @@ wss.on('connection', async function(ws) {
             ws.isReady = res.isReady;
             ws.username = res.username;
 
-            console.log(ws.isReady, op.isReady);
             if (ws.isReady && op.isReady) {
                 console.log("all ready", "\ngame start\n");
                 ws.send(JSON.stringify({startingPlayer: 1, opponentUsername: op.username}));
@@ -57,7 +49,6 @@ wss.on('connection', async function(ws) {
         removeClient(ws.id, WAITINGPLAYERS);
         console.log("number of client", CLIENTS.length);
         let op = await clientByOpponent(ws.id);
-        console.log("op", op);
         if (op && op != 0) {
             op.send(JSON.stringify({USER_DISCONNECTED: ws.id}));
             WAITINGPLAYERS.push(op);
@@ -80,7 +71,7 @@ function clientConnection(a) {
 }
 
 function initGame(CL) {
-    console.log("init game");
+    console.log("init game for", CL[0].id, CL[1].id);
     CL[0].opponent = CL[1].id;
     CL[1].opponent = CL[0].id;
     CL[0].send(JSON.stringify({player1Color: 'W', player2Color: 'B', player: 1}));
@@ -89,7 +80,6 @@ function initGame(CL) {
 
 async function getOpponent(a) {
     try {
-        // console.log("get opponent of",a.id);
         let response = await new Promise((resolve, reject) => {
             var foundId = CLIENTS.findIndex(function (obj) {
                 return obj.id == a.opponent;
@@ -104,13 +94,12 @@ async function getOpponent(a) {
 
         return response !== 0 ? response : a
     } catch (error) {
-        console.log(error);
+        console.info(error);
     }
 }
 
 async function clientByOpponent(a) {
     try {
-        // console.log("get opponent of",a.id);
         let response = await new Promise((resolve, reject) => {
             var foundId = CLIENTS.findIndex(function (obj) {
                 return obj.opponent == a;
@@ -125,13 +114,12 @@ async function clientByOpponent(a) {
 
         return response === 0 ? false : response
     } catch (error) {
-        console.log(error);
+        console.info(error);
     }
 }
 
 async function removeClient(id, l) {
     try {
-        console.log("remove",id);
         let response = await new Promise((resolve, reject) => {
             var foundId = l.findIndex(function (obj) {
                 return obj.id == id;
@@ -148,7 +136,7 @@ async function removeClient(id, l) {
 
         return response === 1 ? true : false
     } catch (error) {
-        console.log(error);
+        console.info(error);
     }
 }
 
