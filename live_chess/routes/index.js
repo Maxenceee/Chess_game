@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 router.get('/solo', function(req, res, next) {
   let q = req.query.type
   if (q) {
-    res.render('chess', { title: 'Duo Local', type: q });
+    res.render('chess', { title: (q === 'local' ? 'Local Game':'Online Game') , type: q });
   } else {
     next();
   }
