@@ -740,12 +740,19 @@ this.gref_ = this.gref_ || {};
             let tableSize = Math.min(window.innerWidth, window.innerHeight)*0.95;
             this.table.style.width = this.table.style.height = tableSize+"px";
 
+            window.onresize = () => { _.resiseTable() };
+
             this.piecesBoard = new Array(8).fill(0).map(() => new Array(8).fill(0));
 
             setTimeout(() => {
-                this.table.classList.add("-show");
+                document.body.classList.add("-show");
             }, 500);
             // console.log(this.piecesBoard);
+        };
+
+        _.resiseTable = () => {
+            let tableSize = Math.min(window.innerWidth, window.innerHeight)*0.95;
+            this.table.style.width = this.table.style.height = tableSize+"px";
         };
 
         _.movePiece = (a, b) => {
@@ -833,11 +840,13 @@ this.gref_ = this.gref_ || {};
                 this.gamePlaying = false;
                 // alert("Black Player Win");
                 _.ischeck(W.chec, "W", true);
+                _.endGame('W');
             } else if (B.chec.length > 0 && B.empty.length <= 0 && !eB) {
                 console.info("check mate B");
                 this.gamePlaying = false;
                 // alert("White Player Win");
                 _.ischeck(B.chec, "B", true);
+                _.endGame('B');
             } else if (W.chec.length > 0) {
                 console.info("check W", W.chec);
                 _.ischeck(W.chec, "W");
@@ -851,6 +860,9 @@ this.gref_ = this.gref_ || {};
         };
 
         _.ischeck = (c, a, b) => {
+            if (_.getElemCl("info-window")) {
+                _.getElemCl("info-window").remove();
+            }
             if (a) {
                 this.checkPanel = _.creatElem({naAttr: "info-window"});
                 let ln = _.creatElem({type: "h1", naAttr: "info-window-t2"});
@@ -859,6 +871,30 @@ this.gref_ = this.gref_ || {};
                 _.getElemCl("window-c").appendChild(this.checkPanel);
             } else {
                 this.checkPanel && this.checkPanel.remove();
+            }
+        };
+
+        _.endGame = (a) => {
+            this.gamePlaying = false;
+            clearInterval(this.playerTimer);
+            this.waitingPan && this.waitingPan.remove();
+            this.popupAlert = _.alertPopup((a == 'W' ? "White" : "Black")+" player win the game!", "Go Home", function() {
+                document.body.classList.add("-leaving");
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 500);
+            }, "Stay here");
+        };
+
+        _.placeRemovePrev = () => {
+            _.getElemCl("w-rm-p").style = "";
+            _.getElemCl("b-rm-p").style = "";
+            if (this.playerColor === 'W') {
+                _.getElemCl("w-rm-p").style.bottom = "50px";
+                _.getElemCl("b-rm-p").style.top = "50px";
+            } else {
+                _.getElemCl("w-rm-p").style.top = "50px";
+                _.getElemCl("b-rm-p").style.bottom = "50px";
             }
         };
 
@@ -959,6 +995,7 @@ this.gref_ = this.gref_ || {};
             this.timerPan = _.getElemID("play-timer");
 
             _.tableGen();
+            _.placeRemovePrev();
 
             console.log(this.piecesBoard);
             setTimeout(() => {
@@ -971,6 +1008,43 @@ this.gref_ = this.gref_ || {};
                 _.initTimer();
                 _.placeRemovePrev();
             }, 1500);
+
+            _.closeGame();
+        };
+
+        _.alertPopup = (t, a, b, c, d) => {
+            this.popupAlert && this.popupAlert.remove();
+            let l = document.createElement('div');
+            l.classList.add('ad-error-pn-c');
+            document.body.appendChild(l);
+            if (!b) {
+                l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div id="ad-err-close-btn" class="ad-err-close">Fermer</div></div>';
+            } else {
+                if (c) {
+                    l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div class="ad-btn"><div id="ad-err-reset-btn" class="ad-err-close ad-demi ad-demi-sup">'+a+'</div><div id="ad-err-close-btn" class="ad-err-close ad-demi">'+c+'</div></div></div>';
+                    document.getElementById('ad-err-reset-btn').addEventListener("click", b);
+                    document.getElementById('ad-err-reset-btn').addEventListener("click", function() {document.body.removeChild(l)});
+                } else {
+                    l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div id="ad-err-close-btn" class="ad-err-close">'+a+'</div></div>';
+                    document.getElementById('ad-err-close-btn').addEventListener("click", b);
+                }
+            }
+            if (d) {
+                document.getElementById('ad-err-close-btn').addEventListener("click", d);
+            }
+            document.getElementById('ad-err-close-btn').addEventListener("click", function() {document.body.removeChild(l)});
+            return l
+        }
+
+        _.closeGame = () => {
+            _.getElemID("close-btn").onclick = () => {
+                this.popupAlert = _.alertPopup("You are going to leave the game", "Leave", function() {
+                    document.body.classList.add("-leaving");
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 500);
+                }.bind(this), "Stay here");
+            }
         };
 
         (function(){

@@ -748,7 +748,7 @@ this.gref_ = this.gref_ || {};
             this.waitingPan && this.waitingPan.remove();
 
             setTimeout(() => {
-                this.table.classList.add("-show");
+                document.body.classList.add("-show");
             }, 500);
             // console.log(this.piecesBoard);
         };
@@ -886,7 +886,10 @@ this.gref_ = this.gref_ || {};
             clearInterval(this.playerTimer);
             this.waitingPan && this.waitingPan.remove();
             this.popupAlert = _.alertPopup((a == this.playerColor ? this.username : this.opponentUsername)+" player win the game!", "Go Home", function() {
-                window.location.href = "/";
+                document.body.classList.add("-leaving");
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 500);
             }, "Stay here");
         };
 
@@ -1025,9 +1028,9 @@ this.gref_ = this.gref_ || {};
             document.body.appendChild(l);
             l.innerHTML = '<div class="ad-error-panel grow-anim"><div class="ad-err"><p style="min-height: auto;">'+t+'</p><div class="fr-text-field"><input required maxlength="15" type="text" id="on-user-input" class="SIU-tf"><label for="name" class="label-name"><span class="content-name">Username</span></label></div></div><div id="ad-err-close-btn" class="ad-err-close">Save</div></div>';
             if (a) {
-                document.getElementById('ad-err-close-btn').addEventListener("click", a);
+                _.getElemID('ad-err-close-btn').addEventListener("click", a);
             }
-            document.getElementById('ad-err-close-btn').addEventListener("click", function() {document.body.removeChild(l)});
+            _.getElemID('ad-err-close-btn').addEventListener("click", function() {document.body.removeChild(l)});
             return l
         };
 
@@ -1050,25 +1053,28 @@ this.gref_ = this.gref_ || {};
             } else {
                 if (c) {
                     l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div class="ad-btn"><div id="ad-err-reset-btn" class="ad-err-close ad-demi ad-demi-sup">'+a+'</div><div id="ad-err-close-btn" class="ad-err-close ad-demi">'+c+'</div></div></div>';
-                    document.getElementById('ad-err-reset-btn').addEventListener("click", b);
-                    document.getElementById('ad-err-reset-btn').addEventListener("click", function() {document.body.removeChild(l)});
+                    _.getElemID('ad-err-reset-btn').addEventListener("click", b);
+                    _.getElemID('ad-err-reset-btn').addEventListener("click", function() {document.body.removeChild(l)});
                 } else {
                     l.innerHTML = '<div class="ad-error-panel"><div class="ad-err"><p>'+t+'</p></div><div id="ad-err-close-btn" class="ad-err-close">'+a+'</div></div>';
-                    document.getElementById('ad-err-close-btn').addEventListener("click", b);
+                    _.getElemID('ad-err-close-btn').addEventListener("click", b);
                 }
             }
             if (d) {
-                document.getElementById('ad-err-close-btn').addEventListener("click", d);
+                _.getElemID('ad-err-close-btn').addEventListener("click", d);
             }
-            document.getElementById('ad-err-close-btn').addEventListener("click", function() {document.body.removeChild(l)});
+            _.getElemID('ad-err-close-btn').addEventListener("click", function() {document.body.removeChild(l)});
             return l
         }
 
         _.connectioTimout = () => {
             setTimeout(() => {
                 if (!this.gamePlaying && !this.isReady) {
-                    this.popupAlert = _.alertPopup("Oops...There's nobody to play with here", "Go Home", () => {
-                        window.location.href = "/";
+                    this.popupAlert = _.alertPopup("Oops...There's nobody to play with here.", "Go Home", () => {
+                        document.body.classList.add("-leaving");
+                        setTimeout(() => {
+                            window.location.href = "/";
+                        }, 500);
                     }, "Try again", () => {_.connectioTimout()});
                 }
             }, 10000);
@@ -1179,13 +1185,17 @@ this.gref_ = this.gref_ || {};
             this.loader = _.addLoader(this.chessRoot);
             this.playerTimer && clearInterval(this.playerTimer);
             _.clearRemovedPieceDisplay();
-            this.popupAlert = _.alertPopup("The other player just disconnected", "Go Home", function() {
-                window.location.href = "/";
+            this.popupAlert = _.alertPopup(this.opponentUsername+" just disconnected!", "Go Home", function() {
+                document.body.classList.add("-leaving");
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 500);
             }, "Wait here");
         };
 
         _.openWS = () => {
             console.log("ws://"+location.hostname+":8080");
+            document.body.classList.add("-online");
             this.socket = new WebSocket("ws://"+location.hostname+":8080");
 
             this.chessRoot = _.getElemID(Kd[0]);
@@ -1227,6 +1237,20 @@ this.gref_ = this.gref_ || {};
                     window.location.href = "/";
                 }, 1000);
             };
+
+            _.closeGame();
+        };
+
+        _.closeGame = () => {
+            _.getElemID("close-btn").onclick = () => {
+                let mess = this.isReady ? "You are going to leave the game. There is no way back." : "You are about to stop player search."
+                this.popupAlert = _.alertPopup(mess, "Leave", function() {
+                    document.body.classList.add("-leaving");
+                    setTimeout(() => {
+                        window.location.href = "/";
+                    }, 500);
+                }.bind(this), "Stay here");
+            }
         };
 
         (function(){
