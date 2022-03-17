@@ -967,7 +967,7 @@ this.gref_ = this.gref_ || {};
             this.playerTurn = a.startingPlayer;
             this.gamePlaying = true;
             (this.playerTurn === this.player) && (this.canPLay = true)
-            this.opponentUsername = a.opponentUsername;
+            this.opponentUsername = (a.opponentUsername === "" ? (this.player === 1 ? "Player 2" : "Player 1") : a.opponentUsername);
             _.debugDisplay();
         };
 
