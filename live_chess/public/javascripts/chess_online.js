@@ -1015,6 +1015,7 @@ this.gref_ = this.gref_ || {};
 
                 this.popupAlert = _.usernamePopup("Choose your username", () => {
                     this.username = _.getElemID('on-user-input').value;
+                    console.log(this.username);
                     this.socket.send(JSON.stringify({isReady: true, player: this.player, username: this.username}));
                     _.showPieces();
                 });
@@ -1027,10 +1028,19 @@ this.gref_ = this.gref_ || {};
             l.classList.add('ad-error-pn-c');
             document.body.appendChild(l);
             l.innerHTML = '<div class="ad-error-panel grow-anim"><div class="ad-err"><p style="min-height: auto;">'+t+'</p><div class="fr-text-field"><input required maxlength="15" type="text" id="on-user-input" class="SIU-tf"><label for="name" class="label-name"><span class="content-name">Username</span></label></div></div><div id="ad-err-close-btn" class="ad-err-close">Save</div></div>';
-            if (a) {
-                _.getElemID('ad-err-close-btn').addEventListener("click", a);
+            var pp = () => {
+                let str = _.getElemID('on-user-input').value;
+                if (!/\s/.test(str)) {
+                    a();
+                    document.body.removeChild(l);
+                } else {
+                    _.getElemID('on-user-input').classList.add('wrong-enter-r');
+                }
+            };
+            _.getElemID('ad-err-close-btn').addEventListener("click", pp);
+            window.onkeyup = (key) => {
+                key.keyCode === 13 && pp()
             }
-            _.getElemID('ad-err-close-btn').addEventListener("click", function() {document.body.removeChild(l)});
             return l
         };
 
