@@ -701,6 +701,17 @@ this.gref_ = this.gref_ || {};
             return (a.y == 0 && this.playerColor == b && this.removedPieces[b].length > 0)
         };
 
+        _.getColorPiecesNumber = (a) => {
+            let count = 0;
+            this.piecesBoard.forEach((e, i) => {
+                e.forEach((u, v) => {
+                    (typeof u === "object" && u.color == a) && (count++);
+                });
+            });
+
+            return count
+        };
+
         _.placePieces = (a, b) => {
             Object.keys(a).forEach((e, i) => {
                 let cell = _.getCell(b[i][0], b[i][1]);
@@ -844,6 +855,12 @@ this.gref_ = this.gref_ || {};
 
             console.log(eW, eB);
 
+            if ((W.empty.length <= 0 && _.getColorPiecesNumber('W') <= 1) || (B.empty.length <= 0 && _.getColorPiecesNumber('B') <= 1)) {
+                console.log('draw game');
+                _.endGame();
+                return
+            }
+
             if (W.chec.length > 0 && W.empty.length <= 0 && !eW) {
                 console.info("check mate W");
                 // alert("Black Player Win");
@@ -885,7 +902,8 @@ this.gref_ = this.gref_ || {};
             this.gamePlaying = false;
             clearInterval(this.playerTimer);
             this.waitingPan && this.waitingPan.remove();
-            this.popupAlert = _.alertPopup((a == this.playerColor ? this.username : this.opponentUsername)+" player win the game!", "Go Home", function() {
+            let mess = a ? (a == this.playerColor ? this.username : this.opponentUsername)+" player win the game!" : "It's a draw!"
+            this.popupAlert = _.alertPopup(mess, "Go Home", function() {
                 document.body.classList.add("-leaving");
                 setTimeout(() => {
                     window.location.href = "/";
