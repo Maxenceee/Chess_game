@@ -735,8 +735,11 @@ this.gref_ = this.gref_ || {};
                             !this.selectedPiece && (this.currentSelect = lc);
 
                             // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)));
-                            console.log("click", _.getPlayerTurn(_.getCellCoord(lc)));
-                            if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
+                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
+                                this.currentSelect.classList.remove("-selected");
+                                this.currentSelect = lc;
+                                this.currentSelect.classList.add("-selected");
+                            } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
                                 _.movePiece(lc, evt);
                                 this.selectedPiece = !this.selectedPiece;
                             }

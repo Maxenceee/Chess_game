@@ -2,62 +2,62 @@ this.gref_ = {
     CONFIG: [["app-root"], [], []],
     PIECES: {
         W: {
-            // WRook1: {
-            //     color: 'W',
-            //     type: 'rook',
-            //     position: [7, 7],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_rlt.svg"
-            // },
-            // WRook2: {
-            //     color: 'W',
-            //     type: 'rook',
-            //     position: [0, 7],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_rlt.svg"
-            // },
-            // WKnigh1: {
-            //     color: 'W',
-            //     type: 'knight',
-            //     position: [6, 7],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_nlt.svg"
-            // },
-            // WKnigh2: {
-            //     color: 'W',
-            //     type: 'knight',
-            //     position: [1, 7],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_nlt.svg"
-            // },
-            // WBishop1: {
-            //     color: 'W',
-            //     type: 'bishop',
-            //     position: [5, 7],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_blt.svg"
-            // },
-            // WBishop2: {
-            //     color: 'W',
-            //     type: 'bishop',
-            //     position: [2, 7],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_blt.svg"
-            // },
-            // WQueen: {
-            //     color: 'W',
-            //     type: 'queen',
-            //     position: [3, 7],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_qlt.svg"
-            // },
+            WRook1: {
+                color: 'W',
+                type: 'rook',
+                position: [7, 7],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_rlt.svg"
+            },
+            WRook2: {
+                color: 'W',
+                type: 'rook',
+                position: [0, 7],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_rlt.svg"
+            },
+            WKnigh1: {
+                color: 'W',
+                type: 'knight',
+                position: [6, 7],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_nlt.svg"
+            },
+            WKnigh2: {
+                color: 'W',
+                type: 'knight',
+                position: [1, 7],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_nlt.svg"
+            },
+            WBishop1: {
+                color: 'W',
+                type: 'bishop',
+                position: [5, 7],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_blt.svg"
+            },
+            WBishop2: {
+                color: 'W',
+                type: 'bishop',
+                position: [2, 7],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_blt.svg"
+            },
+            WQueen: {
+                color: 'W',
+                type: 'queen',
+                position: [3, 7],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_qlt.svg"
+            },
             WKing : {
                 color: 'W',
                 type: 'king',
@@ -66,71 +66,71 @@ this.gref_ = {
                 alreadyMoved: false,
                 img: "Chess_klt.svg"
             },
-            // WPawn1: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [0, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_plt.svg"
-            // },
-            // WPawn2: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [1, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_plt.svg"
-            // },
-            // WPawn3: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [2, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_plt.svg"
-            // },
-            // WPawn4: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [3, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_plt.svg"
-            // },
-            // WPawn5: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [4, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_plt.svg"
-            // },
-            // WPawn6: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [5, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_plt.svg"
-            // },
-            // WPawn7: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [6, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     jump: 'never',
-            //     img: "Chess_plt.svg"
-            // },
-            // WPawn8: {
-            //     color: 'W',
-            //     type: 'pawn',
-            //     position: [7, 6],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_plt.svg"
-            // }
+            WPawn1: {
+                color: 'W',
+                type: 'pawn',
+                position: [0, 6],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_plt.svg"
+            },
+            WPawn2: {
+                color: 'W',
+                type: 'pawn',
+                position: [1, 6],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_plt.svg"
+            },
+            WPawn3: {
+                color: 'W',
+                type: 'pawn',
+                position: [2, 6],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_plt.svg"
+            },
+            WPawn4: {
+                color: 'W',
+                type: 'pawn',
+                position: [3, 6],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_plt.svg"
+            },
+            WPawn5: {
+                color: 'W',
+                type: 'pawn',
+                position: [4, 6],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_plt.svg"
+            },
+            WPawn6: {
+                color: 'W',
+                type: 'pawn',
+                position: [5, 6],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_plt.svg"
+            },
+            WPawn7: {
+                color: 'W',
+                type: 'pawn',
+                position: [6, 6],
+                moves: [],
+                alreadyMoved: false,
+                jump: 'never',
+                img: "Chess_plt.svg"
+            },
+            WPawn8: {
+                color: 'W',
+                type: 'pawn',
+                position: [7, 6],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_plt.svg"
+            }
         },
         B: {
             BRook1: {
@@ -197,71 +197,71 @@ this.gref_ = {
                 alreadyMoved: false,
                 img: "Chess_kdt.svg"
             },
-            // BPawn1: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [0, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_pdt.svg"
-            // },
-            // BPawn2: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [1, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_pdt.svg"
-            // },
-            // BPawn3: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [2, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_pdt.svg"
-            // },
-            // BPawn4: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [3, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     jump: 'never',
-            //     img: "Chess_pdt.svg"
-            // },
-            // BPawn5: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [4, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_pdt.svg"
-            // },
-            // BPawn6: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [5, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_pdt.svg"
-            // },
-            // BPawn7: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [6, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_pdt.svg"
-            // },
-            // BPawn8: {
-            //     color: 'B',
-            //     type: 'pawn',
-            //     position: [7, 1],
-            //     moves: [],
-            //     alreadyMoved: false,
-            //     img: "Chess_pdt.svg"
-            // }
+            BPawn1: {
+                color: 'B',
+                type: 'pawn',
+                position: [0, 1],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_pdt.svg"
+            },
+            BPawn2: {
+                color: 'B',
+                type: 'pawn',
+                position: [1, 1],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_pdt.svg"
+            },
+            BPawn3: {
+                color: 'B',
+                type: 'pawn',
+                position: [2, 1],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_pdt.svg"
+            },
+            BPawn4: {
+                color: 'B',
+                type: 'pawn',
+                position: [3, 1],
+                moves: [],
+                alreadyMoved: false,
+                jump: 'never',
+                img: "Chess_pdt.svg"
+            },
+            BPawn5: {
+                color: 'B',
+                type: 'pawn',
+                position: [4, 1],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_pdt.svg"
+            },
+            BPawn6: {
+                color: 'B',
+                type: 'pawn',
+                position: [5, 1],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_pdt.svg"
+            },
+            BPawn7: {
+                color: 'B',
+                type: 'pawn',
+                position: [6, 1],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_pdt.svg"
+            },
+            BPawn8: {
+                color: 'B',
+                type: 'pawn',
+                position: [7, 1],
+                moves: [],
+                alreadyMoved: false,
+                img: "Chess_pdt.svg"
+            }
         }
     },
     MOVES: {}
@@ -673,11 +673,11 @@ this.gref_ = this.gref_ || {};
         _.canMoveToProtectKing = (a, b, c) => {
             let o = this.piecesBoard[a.x][a.y],
                 n = this.piecesBoard[b.x][b.y];
-            console.log(o, n);
+            // console.log(o, n);
             
             this.piecesBoard[b.x][b.y] = this.piecesBoard[a.x][a.y];
             this.piecesBoard[a.x][a.y] = 0;
-            console.log(this.piecesBoard, o, n);
+            // console.log(this.piecesBoard, o, n);
             if (_.checkKingMovement(c).chec <= 0) {
                 this.piecesBoard[a.x][a.y] = o;
                 this.piecesBoard[b.x][b.y] = n;
@@ -736,8 +736,12 @@ this.gref_ = this.gref_ || {};
                         if (this.gamePlaying && (lc.classList.contains("-chess-image") || this.selectedPiece)) {
                             !this.selectedPiece && (this.currentSelect = lc);
 
-                            // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)));
-                            if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
+                            // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)), this.selectedPiece);
+                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
+                                this.currentSelect.classList.remove("-selected");
+                                this.currentSelect = lc;
+                                this.currentSelect.classList.add("-selected");
+                            } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
                                 _.movePiece(lc, evt);
                                 this.selectedPiece = !this.selectedPiece;
                             }
