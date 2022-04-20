@@ -15,11 +15,11 @@ After installing the dependencies, start the project by running :
 npm start
 ```
 
-App will be available on localhost a specified port in the bin/www file
+App will be available on localhost at specified port in the bin/www file
 
 ## Multiplayer 
 
-To use multiplayer mode, open the 'ws_server' into a new terminal and install dependencies by running :
+To use multiplayer mode, open the 'ws_server' directory into a new terminal and install dependencies by running :
 
 ```sh
 npm i
