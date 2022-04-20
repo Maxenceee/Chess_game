@@ -1,6 +1,6 @@
 # Chess_game
 
-You can use this project on localhost or on a node.js server 
+You can use this project on localhost or on a node.js server to use it online
 ## Usage
 
 Open the 'live_chess' directory into a terminal and install dependencies by running 
@@ -31,4 +31,4 @@ After installing the dependencies, start the server by running :
 npm start
 ```
 
-Server will start on port 8080
+Server will start on port 8080, no more action is needed on server
