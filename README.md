@@ -31,4 +31,4 @@ After installing the dependencies, start the server by running :
 npm start
 ```
 
-Server will start on port 8080, no more action is needed on server
+Server will start on port 8080
