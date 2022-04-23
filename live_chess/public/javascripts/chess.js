@@ -693,6 +693,17 @@ this.gref_ = this.gref_ || {};
             return !_.canMoveToProtectKing(a, b, c);
         };
 
+        _.canKingRock = (a, b) => {
+            let curcoord = _.getCellCoord(a),
+            p = this.piecesBoard[curcoord.x][curcoord.y],
+            type = p.type;
+            return (type == "king" && !p.alreadyMoved)
+        }
+
+        _.kingRock = (a) => {
+            console.log(a);
+        };
+
         _.getColorPiecesNumber = (a) => {
             let count = 0;
             this.piecesBoard.forEach((e, i) => {
@@ -737,10 +748,27 @@ this.gref_ = this.gref_ || {};
                             !this.selectedPiece && (this.currentSelect = lc);
 
                             // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)), this.selectedPiece);
+                            if (_.getPlayerTurn(_.getCellCoord(lc)) && _.canKingRock(lc, this.isDoingRock)) {
+                                this.isDoingRock = true;
+                            }
+                            
                             if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
-                                this.currentSelect.classList.remove("-selected");
-                                this.currentSelect = lc;
-                                this.currentSelect.classList.add("-selected");
+                                let curcoord = _.getCellCoord(lc),
+                                    p = this.piecesBoard[curcoord.x][curcoord.y];
+                                console.log(p);
+
+                                /**
+                                 * king rook 
+                                 */
+                                if (this.isDoingRock && p.type == "rook") {
+                                    _.kingRock(lc);
+                                } else {
+                                    this.isDoingRock = false;
+                                    this.currentSelect.classList.remove("-selected");
+                                    this.currentSelect = lc;
+                                    this.currentSelect.classList.add("-selected");
+                                }
+
                             } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
                                 _.movePiece(lc, evt);
                                 this.selectedPiece = !this.selectedPiece;
@@ -1004,6 +1032,7 @@ this.gref_ = this.gref_ || {};
         _.init = () => {
             this.chessRoot = _.getElemID(Kd[0]);
             this.selectedPiece = false;
+            this.isDoingRock = false;
             this.isWTurn = true;
             this.gamePlaying = false;
             this.removedPieces = {W: [], B: []};
