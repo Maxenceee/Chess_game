@@ -13,37 +13,43 @@ var uuid = require('node-uuid');
  WAITINGPLAYERS = [];
 
 wss.on('connection', async function(ws) {
- ws.id = uuid.v4();
+    ws.id = uuid.v4();
 
- ws.send(JSON.stringify({"CONNECTION_ACCEPTED": true}));
+    ws.send(JSON.stringify({"CONNECTION_ACCEPTED": true}));
 
- ws.on('message', async function(message) {
-     console.log('received: %s', message);
+    ws.on('message', async function(message) {
+        console.log('received: %s', message);
 
-     let op = await getOpponent(ws);
+        let op = await getOpponent(ws);
 
-     let res = JSON.parse(message);
-     if (res.changesCoord) {
-         let newPlayer = res.playerTurn === 1 ? 2 : 1,
-             newmsg = JSON.stringify({changesCoord: res.changesCoord, playerTurn: newPlayer, removedPieces: res.removedPieces});
+        let res = JSON.parse(message);
+        if (res.changesCoord) {
+            let newPlayer = res.playerTurn === 1 ? 2 : 1,
+                newmsg = JSON.stringify({changesCoord: res.changesCoord, playerTurn: newPlayer, removedPieces: res.removedPieces});
 
-         op.send(newmsg);
-     }
-     if (res.pawnPromise) {
-         op.send(JSON.stringify({pawnPromise : {coord: res.pawnPromise.coord, piece: res.pawnPromise.piece, removedPieces: res.pawnPromise.removedPieces}}));
-     }
-     if (res.isReady) {
-         console.log("isReady", res.isReady, ws.id, ws.opponent);
-         ws.isReady = res.isReady;
-         ws.username = res.username;
+            op.send(newmsg);
+        }
+        if (res.castling) {
+            let newPlayer = res.playerTurn === 1 ? 2 : 1,
+                newmsg = JSON.stringify({castling: res.castling, playerTurn: newPlayer});
 
-         if (ws.isReady && op.isReady) {
-             console.log("all ready", "\ngame start\n");
-             ws.send(JSON.stringify({startingPlayer: 1, opponentUsername: op.username}));
-             op.send(JSON.stringify({startingPlayer: 1, opponentUsername: ws.username}));
-         }
-     }
- });
+            op.send(newmsg);
+        }
+        if (res.pawnPromise) {
+            op.send(JSON.stringify({pawnPromise : {coord: res.pawnPromise.coord, piece: res.pawnPromise.piece, removedPieces: res.pawnPromise.removedPieces}}));
+        }
+        if (res.isReady) {
+            console.log("isReady", res.isReady, ws.id, ws.opponent);
+            ws.isReady = res.isReady;
+            ws.username = res.username;
+
+            if (ws.isReady && op.isReady) {
+                console.log("all ready", "\ngame start\n");
+                ws.send(JSON.stringify({startingPlayer: 1, opponentUsername: op.username}));
+                op.send(JSON.stringify({startingPlayer: 1, opponentUsername: ws.username}));
+            }
+        }
+    });
 
  ws.on('close', async function(message) {
      console.log(ws.id, "disconnected");
