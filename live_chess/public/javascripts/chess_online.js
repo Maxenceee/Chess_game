@@ -345,7 +345,7 @@ this.gref_ = this.gref_ || {};
         };
 
         _.getPlayerTurn = (a) => {
-            return (typeof this.piecesBoard[a.x][a.y] === "object" ? (this.piecesBoard[a.x][a.y].color === this.playerColor) : undefined) && this.canPLay
+            return (typeof this.piecesBoard[a.x][a.y] === "object" ? (this.piecesBoard[a.x][a.y].color === this.playerColor) : undefined) && this.canPlay
         };
 
         _.eatingWhenKing = (a, b, c) => {
@@ -697,6 +697,69 @@ this.gref_ = this.gref_ || {};
             return !_.canMoveToProtectKing(a, b, c);
         };
 
+        _.canKingCastling = (a) => {
+            let curcoord = _.getCellCoord(a),
+            pc = this.piecesBoard[curcoord.x][curcoord.y],
+            type = pc.type;
+
+            if (pc.alreadyMoved) return false
+
+            let pos = [],
+                i = 1,
+                p,q,r,s;
+
+            while (true) {
+                if (curcoord.x-i >= 0 && curcoord.x-i < 8) {
+                    if (!p) pos.push([curcoord.x-i, curcoord.y]);
+                    this.piecesBoard[curcoord.x-i][curcoord.y] != 0 && (p = true)
+                }
+                if (curcoord.x+i >= 0 && curcoord.x+i < 8) {
+                    if (!r) pos.push([curcoord.x+i, curcoord.y]);
+                    this.piecesBoard[curcoord.x+i][curcoord.y] != 0 && (r = true)
+                }
+                i++;
+                if (i >= 8) break
+            }
+
+            pos = pos.filter(elm => {return typeof this.piecesBoard[elm[0]][elm[1]] === "object" && this.piecesBoard[elm[0]][elm[1]].type === "rook" });
+
+            return (type == "king" && !pc.alreadyMoved && pos.length > 0)
+        };
+
+        _.makeCastling = (a, b) => {
+            if (a.x > b.x) {
+                console.log("big");
+                if (_.doesMoveEndangerKing(a, {x: a.x-2, y: a.y}, this.piecesBoard[a.x][a.y].color)) return
+                this.piecesBoard[a.x-2][a.y] = this.piecesBoard[a.x][a.y];
+                _.defChessImage(_.getCell(a.x-2, a.y), this.piecesBoard[a.x][a.y].img);
+                _.remChessImage(_.getCell(a.x, a.y));
+                this.piecesBoard[b.x+3][b.y] = this.piecesBoard[b.x][b.y];
+                _.defChessImage(_.getCell(b.x+3, b.y), this.piecesBoard[b.x][b.y].img);
+                _.remChessImage(_.getCell(b.x, b.y));
+            } else {
+                console.log("little");
+                if (_.doesMoveEndangerKing(a, {x: a.x+2, y: a.y}, this.piecesBoard[a.x][a.y].color)) return
+                this.piecesBoard[a.x+2][a.y] = this.piecesBoard[a.x][a.y];
+                _.defChessImage(_.getCell(a.x+2, a.y), this.piecesBoard[a.x][a.y].img);
+                _.remChessImage(_.getCell(a.x, a.y));
+                this.piecesBoard[b.x-2][b.y] = this.piecesBoard[b.x][b.y];
+                _.defChessImage(_.getCell(b.x-2, b.y), this.piecesBoard[b.x][b.y].img);
+                _.remChessImage(_.getCell(b.x, b.y));
+            }
+            this.piecesBoard[a.x][a.y] = 0;
+            this.piecesBoard[a.x][a.y].alreadyMoved = true;
+            this.piecesBoard[b.x][b.y] = 0;
+            this.piecesBoard[b.x][b.y].alreadyMoved = true;
+
+            this.isWTurn = !this.isWTurn;
+            let ko = a,
+                kn = a.x > b.x ? {x: a.x-2, y: a.y} : {x: a.x+2, y: a.y},
+                ro = b,
+                rn = a.x > b.x ? {x: b.x+3, y: b.y} : {x: b.x-2, y: b.y};
+            _.pushCastling(ko, kn, ro, rn);
+            _.debugDisplay();
+        };
+
         _.didPawnGetPromise = (a, b) => {
             return (a.y == 0 && this.playerColor == b && this.removedPieces[b].length > 0)
         };
@@ -735,10 +798,30 @@ this.gref_ = this.gref_ || {};
                             !this.selectedPiece && (this.currentSelect = lc);
 
                             // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)));
+                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc && this.isDoingRock && this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type == "rook" && !this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].alreadyMoved) {
+                                console.log("rook");
+                                return this.popupAlert = _.alertPopup("Do you want to do a castling", "Castling", function() {
+                                    console.log('castling');
+                                    this.currentSelect.classList.remove("-selected");
+                                    this.selectedPiece = false;
+                                    _.makeCastling(_.getCellCoord(this.currentSelect), _.getCellCoord(lc));
+                                }.bind(this), "No", function() {
+                                    this.currentSelect.classList.remove("-selected");
+                                    this.currentSelect = lc;
+                                    this.currentSelect.classList.add("-selected");
+                                    this.isDoingRock = false;
+                                }.bind(this));
+                            }
+                            if (_.canKingCastling(lc)) {
+                                this.isDoingRock = true;
+                            }
+                                
                             if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
+                                this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type !== "king" && (this.isDoingRock = false);
                                 this.currentSelect.classList.remove("-selected");
                                 this.currentSelect = lc;
                                 this.currentSelect.classList.add("-selected");
+
                             } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
                                 _.movePiece(lc, evt);
                                 this.selectedPiece = !this.selectedPiece;
@@ -987,7 +1070,7 @@ this.gref_ = this.gref_ || {};
             console.log("player turn");
             this.playerTurn = a.startingPlayer;
             this.gamePlaying = true;
-            (this.playerTurn === this.player) && (this.canPLay = true)
+            (this.playerTurn === this.player) && (this.canPlay = true)
             this.opponentUsername = (a.opponentUsername === "" ? (this.player === 1 ? "Player 2" : "Player 1") : a.opponentUsername);
             _.debugDisplay();
         };
@@ -1018,7 +1101,7 @@ this.gref_ = this.gref_ || {};
             this.otherPLayerColor = b;
             this.player = c === 1 ? 1 : 2;
             this.otherPLayer = c === 2 ? 2 : 1;
-            this.canPLay = false;
+            this.canPlay = false;
             this.timerPan = _.getElemID("play-timer");
 
             this.calls = 0;
@@ -1128,9 +1211,9 @@ this.gref_ = this.gref_ || {};
             this.selfTimerCount = 0;
             this.otherTimerCount = 0;
             this.playerTimer = window.setInterval(() => {
-                if (this.canPLay) {
+                if (this.canPlay) {
                     this.selfTimerCount++;
-                } else if (!this.canPLay) {
+                } else if (!this.canPlay) {
                     this.otherTimerCount++;
                 }
                 this.timerPan.innerText = (Math.floor(this.selfTimerCount/60)+"'"+this.selfTimerCount%60+"\"")+":"+(Math.floor(this.otherTimerCount/60)+"'"+this.otherTimerCount%60+"\"")
@@ -1142,7 +1225,16 @@ this.gref_ = this.gref_ || {};
         _.pushGameChanges = (a, b) => {
             console.log(a);
             this.socket.send(JSON.stringify({changesCoord: {oldCoord: a, newCoord: b}, playerTurn: this.playerTurn, removedPieces: this.removedPieces}));
-            this.canPLay = false;
+            this.canPlay = false;
+            this.playerTurn = this.playerTurn === 1 ? 2 : 1;
+            _.debugDisplay();
+            this.waitingPan = _.waitingAnim();
+        };
+
+        _.pushCastling = (a, b, c, d) => {
+            console.log(a);
+            this.socket.send(JSON.stringify({castling: {king: {old: a, new: b}, rook: {old: c, new: d}}, playerTurn: this.playerTurn}));
+            this.canPlay = false;
             this.playerTurn = this.playerTurn === 1 ? 2 : 1;
             _.debugDisplay();
             this.waitingPan = _.waitingAnim();
@@ -1171,7 +1263,7 @@ this.gref_ = this.gref_ || {};
         _.updateChanges = (a) => {
             _.ischeck();
             console.log(a);
-            console.log(this.playerTurn, this.canPLay);
+            console.log(this.playerTurn, this.canPlay);
             let oldCell = a.changesCoord.oldCoord,
                 newCell = a.changesCoord.newCoord,
                 ox = oldCell.x,
@@ -1198,12 +1290,64 @@ this.gref_ = this.gref_ || {};
             _.remChessImage(_.getCell(oldCell.x, oldCell.y));
 
             this.playerTurn = a.playerTurn;
-            this.canPLay = true;
+            this.canPlay = true;
 
-            console.log(this.playerTurn, this.canPLay);
+            console.log(this.playerTurn, this.canPlay);
 
             this.removedPieces = a.removedPieces;
             _.updateRemovedPieceDisplay();
+
+            _.debugDisplay(); // debug only to improve
+            _.checkForKingCheck();
+            console.log(this.piecesBoard);
+        };
+
+        _.updateCastling = (a) => {
+            _.ischeck();
+            console.log(a);
+            console.log(this.playerTurn, this.canPlay);
+            let king = a.castling.king,
+                rook = a.castling.rook,
+                // ko = king.old,
+                // kn = king.new,
+                // ro = rook.old,
+                // rn = rook.new,
+                max = this.piecesBoard.length-1;
+
+            [king, rook].forEach((e) => {
+                let o = e.old,
+                    n = e.new;
+                o.y = Math.abs(o.y-max);
+                n.y = Math.abs(n.y-max);
+                console.log(_.getCell(o.x, o.y));
+
+                this.piecesBoard[n.x][n.y] = this.piecesBoard[o.x][o.y];
+                this.piecesBoard[o.x][o.y] = 0;
+
+                _.defChessImage(_.getCell(n.x, n.y), this.piecesBoard[n.x][n.y].img);
+                _.remChessImage(_.getCell(o.x, o.y));
+            });
+            // ko.y = Math.abs(ko.y-max);
+            // kn.y = Math.abs(kn.y-max);
+            // ro.y = Math.abs(ro.y-max);
+            // rn.y = Math.abs(rn.y-max);
+
+            // console.log(_.getCell(ko.x, ko.y), _.getCell(ro.x, ro.y));
+
+            // this.piecesBoard[kn.x][kn.y] = this.piecesBoard[ko.x][ko.y];
+            // this.piecesBoard[ko.x][ko.y] = 0;
+            // this.piecesBoard[rn.x][rn.y] = this.piecesBoard[ro.x][ro.y];
+            // this.piecesBoard[ro.x][ro.y] = 0;
+    
+            // _.defChessImage(_.getCell(kn.x, kn.y), this.piecesBoard[kn.x][kn.y].img);
+            // _.remChessImage(_.getCell(ko.x, ko.y));
+            // _.defChessImage(_.getCell(rn.x, rn.y), this.piecesBoard[rn.x][rn.y].img);
+            // _.remChessImage(_.getCell(ro.x, ro.y));
+
+            this.playerTurn = a.playerTurn;
+            this.canPlay = true;
+
+            console.log(this.playerTurn, this.canPlay);
 
             _.debugDisplay(); // debug only to improve
             _.checkForKingCheck();
@@ -1251,6 +1395,10 @@ this.gref_ = this.gref_ || {};
 
                     if (msg.changesCoord) {
                         _.updateChanges(msg); 
+                        this.waitingPan && this.waitingPan.remove();
+                    };
+                    if (msg.castling) {
+                        _.updateCastling(msg); 
                         this.waitingPan && this.waitingPan.remove();
                     };
                     if (msg.pawnPromise) _.updateFromPromise(msg.pawnPromise);

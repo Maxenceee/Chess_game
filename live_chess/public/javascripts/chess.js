@@ -693,15 +693,62 @@ this.gref_ = this.gref_ || {};
             return !_.canMoveToProtectKing(a, b, c);
         };
 
-        _.canKingRock = (a, b) => {
+        _.canKingCastling = (a) => {
             let curcoord = _.getCellCoord(a),
-            p = this.piecesBoard[curcoord.x][curcoord.y],
-            type = p.type;
-            return (type == "king" && !p.alreadyMoved)
-        }
+            pc = this.piecesBoard[curcoord.x][curcoord.y],
+            type = pc.type;
 
-        _.kingRock = (a) => {
-            console.log(a);
+            if (pc.alreadyMoved) return false
+
+            let pos = [],
+                i = 1,
+                p,q,r,s;
+
+            while (true) {
+                if (curcoord.x-i >= 0 && curcoord.x-i < 8) {
+                    if (!p) pos.push([curcoord.x-i, curcoord.y]);
+                    this.piecesBoard[curcoord.x-i][curcoord.y] != 0 && (p = true)
+                }
+                if (curcoord.x+i >= 0 && curcoord.x+i < 8) {
+                    if (!r) pos.push([curcoord.x+i, curcoord.y]);
+                    this.piecesBoard[curcoord.x+i][curcoord.y] != 0 && (r = true)
+                }
+                i++;
+                if (i >= 8) break
+            }
+
+            pos = pos.filter(elm => {return typeof this.piecesBoard[elm[0]][elm[1]] === "object" && this.piecesBoard[elm[0]][elm[1]].type === "rook" });
+
+            return (type == "king" && !pc.alreadyMoved && pos.length > 0)
+        };
+
+        _.makeCastling = (a, b) => {
+            if (a.x > b.x) {
+                console.log("big");
+                if (_.doesMoveEndangerKing(a, {x: a.x-2, y: a.y}, this.piecesBoard[a.x][a.y].color)) return
+                this.piecesBoard[a.x-2][a.y] = this.piecesBoard[a.x][a.y];
+                _.defChessImage(_.getCell(a.x-2, a.y), this.piecesBoard[a.x][a.y].img);
+                _.remChessImage(_.getCell(a.x, a.y));
+                this.piecesBoard[b.x+3][b.y] = this.piecesBoard[b.x][b.y];
+                _.defChessImage(_.getCell(b.x+3, b.y), this.piecesBoard[b.x][b.y].img);
+                _.remChessImage(_.getCell(b.x, b.y));
+            } else {
+                console.log("little");
+                if (_.doesMoveEndangerKing(a, {x: a.x+2, y: a.y}, this.piecesBoard[a.x][a.y].color)) return
+                this.piecesBoard[a.x+2][a.y] = this.piecesBoard[a.x][a.y];
+                _.defChessImage(_.getCell(a.x+2, a.y), this.piecesBoard[a.x][a.y].img);
+                _.remChessImage(_.getCell(a.x, a.y));
+                this.piecesBoard[b.x-2][b.y] = this.piecesBoard[b.x][b.y];
+                _.defChessImage(_.getCell(b.x-2, b.y), this.piecesBoard[b.x][b.y].img);
+                _.remChessImage(_.getCell(b.x, b.y));
+            }
+            this.piecesBoard[a.x][a.y] = 0;
+            this.piecesBoard[a.x][a.y].alreadyMoved = true;
+            this.piecesBoard[b.x][b.y] = 0;
+            this.piecesBoard[b.x][b.y].alreadyMoved = true;
+
+            this.isWTurn = !this.isWTurn;
+            _.debugDisplay();
         };
 
         _.getColorPiecesNumber = (a) => {
@@ -747,32 +794,35 @@ this.gref_ = this.gref_ || {};
                         if (this.gamePlaying && (lc.classList.contains("-chess-image") || this.selectedPiece)) {
                             !this.selectedPiece && (this.currentSelect = lc);
 
-                            // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)), this.selectedPiece);
-                            if (_.getPlayerTurn(_.getCellCoord(lc)) && _.canKingRock(lc, this.isDoingRock)) {
-                                this.isDoingRock = true;
-                            }
-                            
-                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
-                                let curcoord = _.getCellCoord(lc),
-                                    p = this.piecesBoard[curcoord.x][curcoord.y];
-                                console.log(p);
-
-                                /**
-                                 * king rook 
-                                 */
-                                if (this.isDoingRock && p.type == "rook") {
-                                    _.kingRock(lc);
-                                } else {
-                                    this.isDoingRock = false;
+                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc && this.isDoingRock && this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type == "rook" && !this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].alreadyMoved) {
+                                console.log("rook");
+                                return this.popupAlert = _.alertPopup("Do you want to do a castling", "Castling", function() {
+                                    console.log('castling');
+                                    this.currentSelect.classList.remove("-selected");
+                                    this.selectedPiece = false;
+                                    _.makeCastling(_.getCellCoord(this.currentSelect), _.getCellCoord(lc));
+                                }.bind(this), "No", function() {
                                     this.currentSelect.classList.remove("-selected");
                                     this.currentSelect = lc;
                                     this.currentSelect.classList.add("-selected");
-                                }
+                                    this.isDoingRock = false;
+                                }.bind(this));
+                            }
+                            if (_.canKingCastling(lc)) {
+                                this.isDoingRock = true;
+                            }
+                                
+                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
+                                this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type !== "king" && (this.isDoingRock = false);
+                                this.currentSelect.classList.remove("-selected");
+                                this.currentSelect = lc;
+                                this.currentSelect.classList.add("-selected");
 
                             } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
                                 _.movePiece(lc, evt);
                                 this.selectedPiece = !this.selectedPiece;
                             }
+                            console.log(this.isDoingRock);
                         }
                     });
                     le.appendChild(lc);
@@ -937,8 +987,8 @@ this.gref_ = this.gref_ || {};
         };
 
         _.placeRemovePrev = () => {
-            _.getElemCl("w-rm-p").style = "";
-            _.getElemCl("b-rm-p").style = "";
+            // _.getElemCl("w-rm-p").style = "";
+            // _.getElemCl("b-rm-p").style = "";
             if (this.playerColor === 'W') {
                 _.getElemCl("w-rm-p").style.bottom = "50px";
                 _.getElemCl("b-rm-p").style.top = "50px";

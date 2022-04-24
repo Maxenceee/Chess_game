@@ -26,6 +26,12 @@ wss.on('connection', async function(ws) {
 
             op.send(newmsg);
         }
+        if (res.castling) {
+            let newPlayer = res.playerTurn === 1 ? 2 : 1,
+                newmsg = JSON.stringify({castling: res.castling, playerTurn: newPlayer});
+
+            op.send(newmsg);
+        }
         if (res.pawnPromise) {
             op.send(JSON.stringify({pawnPromise : {coord: res.pawnPromise.coord, piece: res.pawnPromise.piece, removedPieces: res.pawnPromise.removedPieces}}));
         }

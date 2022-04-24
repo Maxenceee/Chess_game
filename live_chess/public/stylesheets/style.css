@@ -455,10 +455,22 @@ body {
 	flex-wrap: wrap;
 	justify-content: center;
 	align-items: center;
+	right: 50px;
 }
 
-.w-rm-p, .b-rm-p {
+.rock-window {
+	position: absolute;
+	width: 150px;
+	min-height: 100px;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	bottom: 50px;
 	right: 50px;
+	border-radius: 20px;
+	background-color: var(--cf-blue-2);
+	box-shadow: 0 0 15px 5px var(--shadow);
 }
 
 .removed-priece {
