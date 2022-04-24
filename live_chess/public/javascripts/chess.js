@@ -1168,7 +1168,7 @@ this.gref_ = this.gref_ || {};
 
         _.closeGame = () => {
             _.getElemID("close-btn").onclick = () => {
-                this.popupAlert = _.alertPopup("You are going to leave the game", "Leave", function() {
+                this.popupAlert = _.alertPopup("You are going to leave the game.", "Leave", function() {
                     document.body.classList.add("-leaving");
                     setTimeout(() => {
                         window.location.href = "/";

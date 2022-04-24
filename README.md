@@ -17,18 +17,12 @@ npm start
 
 App will be available on localhost at specified port in the bin/www file
 
-## Multiplayer 
+## Multiplayer
 
-To use multiplayer mode, open the 'ws_server' directory into a new terminal and install dependencies by running :
+Multiplayer websocket server will automaticaly start on port 8080
 
-```sh
-npm i
-```
+Multiple games can be played at the same time, players are automatically matched
 
-After installing the dependencies, start the server by running :
+## Note 
 
-```sh
-npm start
-```
-
-Server will start on port 8080
+The ws_server file is meant to create distant websocket server
