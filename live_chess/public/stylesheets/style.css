@@ -353,18 +353,28 @@ body {
 }
 
 .chess-cell {
-	background-repeat: no-repeat;
-	/* background-size: 100%; */
+	/* background-repeat: no-repeat;
 	background-size: contain;
-	background-position: center center;
+	background-position: center center; */
+	/* background-size: 100%; */
 	/* transition: 0.3s ease-in-out; */
 }
 
-.chess-cell.-hide {
+.cell-content {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	/* display: inline-block; */
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-position: center center;
+}
+
+.chess-cell.-hide .cell-content {
 	background-size: 0%;
 }
 
-.chess-cell.-selected {
+.chess-cell.-selected .cell-content {
 	background-color: var(--cf-green-6);
 	background-size: 80%;
 	transition: 0.3s ease-in-out;
@@ -425,6 +435,10 @@ body {
 
 .turn-window h1, .info-window h1, .wait-pan h1 {
 	color: #FFF;
+}
+
+.info-window h1 {
+	font-size: 1em;
 }
 
 .wait-pan h1 {

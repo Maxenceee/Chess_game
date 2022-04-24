@@ -321,13 +321,13 @@ this.gref_ = this.gref_ || {};
         };
 
         _.defChessImage = (a, b) => {
-            a.style.backgroundImage = 'url(/images/'+b+')';
+            a.querySelector('.cell-content').style.backgroundImage = 'url(/images/'+b+')';
             a.classList.add("-chess-image");
             a.setAttribute("ispiece", true);
         };
 
         _.remChessImage = (a) => {
-            a.style.backgroundImage = "";
+            a.querySelector('.cell-content').style.backgroundImage = "";
             a.classList.remove("-chess-image");
             a.setAttribute("ispiece", false);
         };
@@ -727,29 +727,31 @@ this.gref_ = this.gref_ || {};
         };
 
         _.makeCastling = (a, b) => {
+            let an,
+                bn;
+
             if (a.x > b.x) {
                 console.log("big");
-                if (_.doesMoveEndangerKing(a, {x: a.x-2, y: a.y}, this.piecesBoard[a.x][a.y].color)) return
-                this.piecesBoard[a.x-2][a.y] = this.piecesBoard[a.x][a.y];
-                _.defChessImage(_.getCell(a.x-2, a.y), this.piecesBoard[a.x][a.y].img);
-                _.remChessImage(_.getCell(a.x, a.y));
-                this.piecesBoard[b.x+3][b.y] = this.piecesBoard[b.x][b.y];
-                _.defChessImage(_.getCell(b.x+3, b.y), this.piecesBoard[b.x][b.y].img);
-                _.remChessImage(_.getCell(b.x, b.y));
+                an = a.x-2;
+                bn = b.x+3;
             } else {
                 console.log("little");
-                if (_.doesMoveEndangerKing(a, {x: a.x+2, y: a.y}, this.piecesBoard[a.x][a.y].color)) return
-                this.piecesBoard[a.x+2][a.y] = this.piecesBoard[a.x][a.y];
-                _.defChessImage(_.getCell(a.x+2, a.y), this.piecesBoard[a.x][a.y].img);
-                _.remChessImage(_.getCell(a.x, a.y));
-                this.piecesBoard[b.x-2][b.y] = this.piecesBoard[b.x][b.y];
-                _.defChessImage(_.getCell(b.x-2, b.y), this.piecesBoard[b.x][b.y].img);
-                _.remChessImage(_.getCell(b.x, b.y));
+                an = a.x+2;
+                bn = b.x-2;
             }
+            
+            if (_.doesMoveEndangerKing(a, {x: an, y: a.y}, this.piecesBoard[a.x][a.y].color)) return
+            this.piecesBoard[an][a.y] = this.piecesBoard[a.x][a.y];
+            _.defChessImage(_.getCell(an, a.y), this.piecesBoard[a.x][a.y].img);
+            _.remChessImage(_.getCell(a.x, a.y));
+            this.piecesBoard[an][a.y].alreadyMoved = true;
+            this.piecesBoard[bn][b.y] = this.piecesBoard[b.x][b.y];
+            _.defChessImage(_.getCell(bn, b.y), this.piecesBoard[b.x][b.y].img);
+            _.remChessImage(_.getCell(b.x, b.y));
+            this.piecesBoard[bn][b.y].alreadyMoved = true;
+
             this.piecesBoard[a.x][a.y] = 0;
-            this.piecesBoard[a.x][a.y].alreadyMoved = true;
             this.piecesBoard[b.x][b.y] = 0;
-            this.piecesBoard[b.x][b.y].alreadyMoved = true;
 
             this.isWTurn = !this.isWTurn;
             let ko = a,
@@ -793,41 +795,76 @@ this.gref_ = this.gref_ || {};
                 le = _.creatElem({type: "tr", attr: {id: "table_row_"+i, class: "table-row"}});
                 for(var j = 0; j < 8; j++) {
                     let lc = _.creatElem({type: "td", attr: {id: "cell_"+j+"_"+i, class: _.lps(i, j), cellx: j, celly: i, ispiece: false}});
-                    lc.addEventListener("click", (evt) => {
-                        if (this.gamePlaying && (lc.classList.contains("-chess-image") || this.selectedPiece)) {
-                            !this.selectedPiece && (this.currentSelect = lc);
-
-                            // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)));
-                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc && this.isDoingRock && this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type == "rook" && !this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].alreadyMoved) {
-                                console.log("rook");
-                                return this.popupAlert = _.alertPopup("Do you want to do a castling", "Castling", function() {
-                                    console.log('castling');
-                                    this.currentSelect.classList.remove("-selected");
-                                    this.selectedPiece = false;
-                                    _.makeCastling(_.getCellCoord(this.currentSelect), _.getCellCoord(lc));
-                                }.bind(this), "No", function() {
-                                    this.currentSelect.classList.remove("-selected");
-                                    this.currentSelect = lc;
-                                    this.currentSelect.classList.add("-selected");
-                                    this.isDoingRock = false;
-                                }.bind(this));
-                            }
-                            if (_.canKingCastling(lc)) {
-                                this.isDoingRock = true;
-                            }
-                                
-                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
-                                this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type !== "king" && (this.isDoingRock = false);
-                                this.currentSelect.classList.remove("-selected");
-                                this.currentSelect = lc;
-                                this.currentSelect.classList.add("-selected");
-
-                            } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
-                                _.movePiece(lc, evt);
-                                this.selectedPiece = !this.selectedPiece;
-                            }
+                    lc.appendChild(_.creatElem({attr: {class: "cell-content", draggable: true}}));
+                    
+                    let that = this;
+                    lc.addEventListener('dragstart', function(e) {
+                        if (!_.getPlayerTurn(_.getCellCoord(lc))) return
+                        if (_.canKingCastling(lc)) {
+                            that.isDoingRock = true;
                         }
+                        that.selectedPiece = true;
+                        that.currentSelect = lc;
                     });
+
+                    lc.addEventListener('dragend', function(e) {
+                        that.selectedPiece = false;
+                        that.isDoingRock && (that.isDoingRock = false);
+                    });
+
+                    lc.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                    });
+
+                    lc.addEventListener('drop', function(e) {
+                        if (_.getPlayerTurn(_.getCellCoord(lc)) && that.isDoingRock && that.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type == "rook" && !that.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].alreadyMoved) {
+                            console.log("castling");
+                            _.makeCastling(_.getCellCoord(that.currentSelect), _.getCellCoord(lc));
+                        }
+                        _.movePiece(this);
+                    });
+
+                    /**
+                     *  Click event to select pieces -- replaced by drag & drop 
+                     */
+                    
+                    // lc.addEventListener("click", (evt) => {
+                    //     if (this.gamePlaying && (lc.classList.contains("-chess-image") || this.selectedPiece)) {
+                    //         !this.selectedPiece && (this.currentSelect = lc);
+
+                    //         // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)));
+                    //         if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc && this.isDoingRock && this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type == "rook" && !this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].alreadyMoved) {
+                    //             console.log("rook");
+                    //             return this.popupAlert = _.alertPopup("Do you want to do a castling", "Castling", function() {
+                    //                 console.log('castling');
+                    //                 this.currentSelect.classList.remove("-selected");
+                    //                 this.selectedPiece = false;
+                    //                 _.makeCastling(_.getCellCoord(this.currentSelect), _.getCellCoord(lc));
+                    //             }.bind(this), "No", function() {
+                    //                 this.currentSelect.classList.remove("-selected");
+                    //                 this.currentSelect = lc;
+                    //                 this.currentSelect.classList.add("-selected");
+                    //                 this.isDoingRock = false;
+                    //             }.bind(this));
+                    //         }
+                    //         if (_.canKingCastling(lc)) {
+                    //             this.isDoingRock = true;
+                    //         }
+                                
+                    //         if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
+                    //             this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type !== "king" && (this.isDoingRock = false);
+                    //             this.currentSelect.classList.remove("-selected");
+                    //             this.currentSelect = lc;
+                    //             this.currentSelect.classList.add("-selected");
+
+                    //         } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
+                    //             this.currentSelect && (this.currentSelect.classList.toggle("-selected"));
+                    //             _.movePiece(lc, evt);
+                    //             this.selectedPiece = !this.selectedPiece;
+                    //         }
+                    //     }
+                    // });
+
                     le.appendChild(lc);
                 }
                 this.table.appendChild(le);
@@ -857,7 +894,6 @@ this.gref_ = this.gref_ || {};
 
         _.movePiece = (a, b) => {
             // console.log(this.selectedPiece, this.currentSelect);
-            this.currentSelect && (this.currentSelect.classList.toggle("-selected"));
             if (this.selectedPiece) {
                 let oldCell = _.getCellCoord(this.currentSelect),
                     newCell = _.getCellCoord(a),
@@ -977,7 +1013,7 @@ this.gref_ = this.gref_ || {};
                 this.checkPanel = _.creatElem({naAttr: "info-window"});
                 let ln = _.creatElem({type: "h1", naAttr: "info-window-t2"});
                 this.checkPanel.appendChild(ln);
-                ln.innerText = (a == 'W' ? "White" : "Black") + " King is in Check" + (b ? "mate" : "") + " "+c;
+                ln.innerText = (a == 'W' ? "White" : "Black") + " King is in Check" + (b ? "mate" : "") + " "+(c[0][0]+1)+";"+(c[0][1]+1);
                 _.getElemCl("window-c").appendChild(this.checkPanel);
             } else {
                 this.checkPanel && this.checkPanel.remove();
@@ -1131,7 +1167,7 @@ this.gref_ = this.gref_ || {};
             let l = document.createElement('div');
             l.classList.add('ad-error-pn-c');
             document.body.appendChild(l);
-            l.innerHTML = '<div class="ad-error-panel grow-anim"><div class="ad-err"><p style="min-height: auto;">'+t+'</p><div class="fr-text-field"><input required maxlength="15" type="text" id="on-user-input" class="SIU-tf"><label for="name" class="label-name"><span class="content-name">Username</span></label></div></div><div id="ad-err-close-btn" class="ad-err-close">Save</div></div>';
+            l.innerHTML = '<div class="ad-error-panel grow-anim"><div class="ad-err"><p style="min-height: auto;">'+t+'</p><div class="fr-text-field"><input autofocus required maxlength="15" type="text" id="on-user-input" class="SIU-tf"><label for="name" class="label-name"><span class="content-name">Username</span></label></div></div><div id="ad-err-close-btn" class="ad-err-close">Save</div></div>';
             var pp = () => {
                 let str = _.getElemID('on-user-input').value;
                 if (!/\s/.test(str)) {
