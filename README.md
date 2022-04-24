@@ -25,4 +25,4 @@ Multiple games can be played at the same time, players are automatically matched
 
 ## Note 
 
-The ws_server file is meant to create distant websocket server
+The 'ws_server' file is meant to create distant websocket server
