@@ -800,6 +800,7 @@ this.gref_ = this.gref_ || {};
                     let that = this;
                     lc.addEventListener('dragstart', function(e) {
                         if (!_.getPlayerTurn(_.getCellCoord(lc))) return
+                        that.currentSelect.classList.remove("-selected");
                         if (_.canKingCastling(lc)) {
                             that.isDoingRock = true;
                         }
@@ -827,45 +828,45 @@ this.gref_ = this.gref_ || {};
                     });
 
                     /**
-                     *  Click event to select pieces -- replaced by drag & drop 
+                     *  Click event to select pieces
                      */
                     
-                    // lc.addEventListener("click", (evt) => {
-                    //     if (this.gamePlaying && (lc.classList.contains("-chess-image") || this.selectedPiece)) {
-                    //         !this.selectedPiece && (this.currentSelect = lc);
+                    lc.addEventListener("click", (evt) => {
+                        if (this.gamePlaying && (lc.classList.contains("-chess-image") || this.selectedPiece)) {
+                            !this.selectedPiece && (this.currentSelect = lc);
 
-                    //         // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)));
-                    //         if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc && this.isDoingRock && this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type == "rook" && !this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].alreadyMoved) {
-                    //             console.log("rook");
-                    //             return this.popupAlert = _.alertPopup("Do you want to do a castling", "Castling", function() {
-                    //                 console.log('castling');
-                    //                 this.currentSelect.classList.remove("-selected");
-                    //                 this.selectedPiece = false;
-                    //                 _.makeCastling(_.getCellCoord(this.currentSelect), _.getCellCoord(lc));
-                    //             }.bind(this), "No", function() {
-                    //                 this.currentSelect.classList.remove("-selected");
-                    //                 this.currentSelect = lc;
-                    //                 this.currentSelect.classList.add("-selected");
-                    //                 this.isDoingRock = false;
-                    //             }.bind(this));
-                    //         }
-                    //         if (_.canKingCastling(lc)) {
-                    //             this.isDoingRock = true;
-                    //         }
+                            // console.log("hisTurn", _.getPlayerTurn(_.getCellCoord(lc)));
+                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc && this.isDoingRock && this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type == "rook" && !this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].alreadyMoved) {
+                                console.log("rook");
+                                return this.popupAlert = _.alertPopup("Do you want to do a castling", "Castling", function() {
+                                    console.log('castling');
+                                    this.currentSelect.classList.remove("-selected");
+                                    this.selectedPiece = false;
+                                    _.makeCastling(_.getCellCoord(this.currentSelect), _.getCellCoord(lc));
+                                }.bind(this), "No", function() {
+                                    this.currentSelect.classList.remove("-selected");
+                                    this.currentSelect = lc;
+                                    this.currentSelect.classList.add("-selected");
+                                    this.isDoingRock = false;
+                                }.bind(this));
+                            }
+                            if (_.canKingCastling(lc)) {
+                                this.isDoingRock = true;
+                            }
                                 
-                    //         if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
-                    //             this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type !== "king" && (this.isDoingRock = false);
-                    //             this.currentSelect.classList.remove("-selected");
-                    //             this.currentSelect = lc;
-                    //             this.currentSelect.classList.add("-selected");
+                            if (this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc)) && this.currentSelect != lc) {
+                                this.piecesBoard[_.getCellCoord(lc).x][_.getCellCoord(lc).y].type !== "king" && (this.isDoingRock = false);
+                                this.currentSelect.classList.remove("-selected");
+                                this.currentSelect = lc;
+                                this.currentSelect.classList.add("-selected");
 
-                    //         } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
-                    //             this.currentSelect && (this.currentSelect.classList.toggle("-selected"));
-                    //             _.movePiece(lc, evt);
-                    //             this.selectedPiece = !this.selectedPiece;
-                    //         }
-                    //     }
-                    // });
+                            } else if ((!this.selectedPiece && _.getPlayerTurn(_.getCellCoord(lc))) || this.selectedPiece) {
+                                this.currentSelect && (this.currentSelect.classList.toggle("-selected"));
+                                _.movePiece(lc, evt);
+                                this.selectedPiece = !this.selectedPiece;
+                            }
+                        }
+                    });
 
                     le.appendChild(lc);
                 }
@@ -1026,7 +1027,7 @@ this.gref_ = this.gref_ || {};
             this.gamePlaying = false;
             clearInterval(this.playerTimer);
             this.waitingPan && this.waitingPan.remove();
-            let mess = a ? (a == this.playerColor ? this.username : this.opponentUsername)+" player win the game!" : "It's a draw!"
+            let mess = a ? (a == this.playerColor ? this.opponentUsername : this.username)+" player win the game!" : "It's a draw!"
             this.popupAlert = _.alertPopup(mess, "Go Home", function() {
                 document.body.classList.add("-leaving");
                 setTimeout(() => {
