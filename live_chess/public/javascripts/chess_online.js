@@ -953,7 +953,9 @@ this.gref_ = this.gref_ || {};
                         _.pawnPromisePanel(this.piecesBoard[newCell.x][newCell.y].color, newCell, oldCell, newCell);
                     } else {
                         console.log("is not pawn promise");
-                        _.pushGameChanges(oldCell, newCell);
+                        setTimeout(() => {
+                            _.pushGameChanges(oldCell, newCell);
+                        }, 0);
                         _.checkForKingCheck();
                     }
 
@@ -980,7 +982,7 @@ this.gref_ = this.gref_ || {};
 
             console.log(eW, eB);
 
-            if ((W.empty.length <= 0 && _.getColorPiecesNumber('W') <= 1) || (B.empty.length <= 0 && _.getColorPiecesNumber('B') <= 1)) {
+            if ((W.empty.length <= 0 && _.getColorPiecesNumber('W') <= 1) || (B.empty.length <= 0 && _.getColorPiecesNumber('B') <= 1) || ( _.getColorPiecesNumber('W') <= 1 && _.getColorPiecesNumber('B') <= 1)) {
                 console.log('draw game');
                 _.endGame();
                 return
@@ -1049,9 +1051,11 @@ this.gref_ = this.gref_ || {};
                     console.log(d);
                     d.splice(c, 1);
                     p.remove();
-                    _.updateRemovedPieceDisplay();
-                    _.pushGameChanges(e, f);
-                    _.pushPawnPromise(a, b);
+                    setTimeout(() => {
+                        _.updateRemovedPieceDisplay();
+                        _.pushGameChanges(e, f);
+                        _.pushPawnPromise(a, b);
+                    }, 0);
                     _.checkForKingCheck();
                 }
     

@@ -966,7 +966,7 @@ this.gref_ = this.gref_ || {};
 
             console.log(eW, eB);
 
-            if ((W.empty.length <= 0 && _.getColorPiecesNumber('W') <= 1) || (B.empty.length <= 0 && _.getColorPiecesNumber('B') <= 1)) {
+            if ((W.empty.length <= 0 && _.getColorPiecesNumber('W') <= 1) || (B.empty.length <= 0 && _.getColorPiecesNumber('B') <= 1) || ( _.getColorPiecesNumber('W') <= 1 && _.getColorPiecesNumber('B') <= 1)) {
                 console.log('draw game');
                 _.endGame();
                 return
