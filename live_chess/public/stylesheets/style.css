@@ -360,6 +360,10 @@ body {
 	/* transition: 0.3s ease-in-out; */
 }
 
+.chess-cell.-invisible .cell-content {
+	opacity: 0;
+}
+
 .cell-content {
 	position: relative;
 	width: 100%;

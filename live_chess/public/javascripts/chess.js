@@ -800,13 +800,15 @@ this.gref_ = this.gref_ || {};
                         if (_.canKingCastling(lc)) {
                             that.isDoingRock = true;
                         }
+                        setTimeout(() => (this.classList.add('-invisible')), 0);
                         that.selectedPiece = true;
                         that.currentSelect = lc;
                     });
-
+                    
                     lc.addEventListener('dragend', function(e) {
                         that.selectedPiece = false;
                         that.isDoingRock && (that.isDoingRock = false);
+                        setTimeout(() => (this.classList.remove('-invisible')), 0);
                     });
 
                     lc.addEventListener('dragover', function(e) {
