@@ -1,5 +1,7 @@
 this.gref_ = {
+    // UI elements
     CONFIG: [["app-root"], [], []],
+    // Game pieces as objects
     PIECES: {
         W: {
             WRook1: {
@@ -264,6 +266,7 @@ this.gref_ = {
             }
         }
     },
+    // Players pieces positions
     POSITIONS: {
         PLAYER1: [[7, 7],[0, 7],[6, 7],[1, 7],[5, 7],[2, 7],[3, 7],[4, 7],[0, 6],[1, 6],[2, 6],[3, 6],[5, 6],[4, 6],[6, 6],[7, 6]],
         PLAYER2: [[0, 0],[7, 0],[1, 0],[6, 0],[2, 0],[5, 0],[3, 0],[4, 0],[0, 1],[1, 1],[2, 1],[3, 1],[4, 1],[5, 1],[6, 1],[7, 1]]
@@ -276,19 +279,23 @@ this.gref_ = this.gref_ || {};
         "use strict";
         var Kr, Kd, Km;
         var PW, PB;
+        // Parsing UI as var
         _ && _.CONFIG ? (Kd = _.CONFIG[0], Kr = _.CONFIG[1], Km = _.CONFIG[2]) || {} : (Kr = [], Kd = [], Km = []);
         _ && _.PIECES ? (PW = _.PIECES.W, PB = _.PIECES.B) : (PW = {}, PB = {});
         _ && _.POSITIONS ? (P1 = _.POSITIONS.PLAYER1, P2 = _.POSITIONS.PLAYER2) : (P1 = [], P1 = []);
         console.log(_, Kd, Kr, Km, PW, PB, P1, P2);
 
+        // Return document element by id
         _.getElemID = (a) => {
             return document.getElementById(a);
         };
 
+        // Return document element by class
         _.getElemCl = (a) => {
             return document.getElementsByClassName(a)[0];
         };
 
+        // Create document element with custom attributes
         _.creatElem = ({type="div", attr="class", naAttr}={}) => {
             let e = document.createElement(type);
 
@@ -298,6 +305,7 @@ this.gref_ = this.gref_ || {};
             return e
         };
 
+        // Define several attributes on element
         _.defAttr = (a, b) => {
             (a && b) && Object.keys(b).forEach(attr => {
                 a.setAttribute(attr, b[attr]);
@@ -305,6 +313,7 @@ this.gref_ = this.gref_ || {};
             return a
         };
 
+        // Return cell element by coords
         _.getCell = (x, y) => {
             let fy = document.querySelectorAll('[celly="'+y+'"]');
             return Array.prototype.filter.call(fy, function( node ) {
@@ -312,42 +321,51 @@ this.gref_ = this.gref_ || {};
             })[0];
         };
 
+        // Return cell element coords
         _.getCellCoord = (a) => {
             return {x: parseInt(a.getAttribute("cellx")), y: parseInt(a.getAttribute("celly"))}
         };
 
+        // Return background table cell color
         _.lps = (a, b) => {
             return ((a+b) % 2 == 0 ? "cell_1" : "cell_2") + " chess-cell"
         };
 
+        // Define cell element background image
         _.defChessImage = (a, b) => {
             a.querySelector('.cell-content').style.backgroundImage = 'url(/images/'+b+')';
             a.classList.add("-chess-image");
             a.setAttribute("ispiece", true);
         };
 
+        // Remove cell element background image
         _.remChessImage = (a) => {
             a.querySelector('.cell-content').style.backgroundImage = "";
             a.classList.remove("-chess-image");
             a.setAttribute("ispiece", false);
         };
 
+        // Check if two cells are the same
         _.isSameCell = (a, b) => {
             return (a.x === b.x && a.y === b.y)
         };
 
+        // Check if a cell is empty
         _.isEmpty = (a) => {
             return (this.piecesBoard[a.x][a.y] === 0)
         };
 
+        // Check if cell can be eat
         _.isEating = (a, b) => {
             return (this.piecesBoard[a.x][a.y].color !== this.piecesBoard[b.x][b.y].color) && this.piecesBoard[b.x][b.y].type !== "king"
         };
 
+        // Check if presented piece is one of playing player
         _.getPlayerTurn = (a) => {
             return (typeof this.piecesBoard[a.x][a.y] === "object" ? (this.piecesBoard[a.x][a.y].color === this.playerColor) : undefined) && this.canPlay
         };
 
+        // Check if a king can eat a cell without endangering himself
         _.eatingWhenKing = (a, b, c) => {
             // console.log("eatingWhenKing", a, b, c);
             
@@ -360,10 +378,12 @@ this.gref_ = this.gref_ || {};
             return (!_.isSameCell(a, b) && c === 'king' && _.canKingEatCell(a, b) && l.pos.length <= 0)
         };
 
+        // Check if a king can eat a cell
         _.canKingEatCell = (a, b) => {
             return _.kingMove(a, b, true) && this.piecesBoard[a.x][a.y].color !== this.piecesBoard[b.x][b.y].color && !_.isEmpty(b)
         };
 
+        // Check if a king as eatable cells around
         _.canKingEatArround = (b) => {
             let a;
             this.piecesBoard.forEach((e, i) => {
@@ -387,9 +407,10 @@ this.gref_ = this.gref_ || {};
             return r.length > 0
         };
 
+        // Return if pawn piece can move to presented cell
         _.pawnMove = (a, b, c) => {
-            let d = (c && 1) || -1
-            let pos = [];
+            let d = (c && 1) || -1,
+                pos = [];
             (this.piecesBoard[a.x][a.y].alreadyMoved == false && this.piecesBoard[a.x][a.y].type == "pawn") && pos.push([a.x, a.y+(c ? 2 : -2)]);
 
             // console.log(this.piecesBoard[a.x][a.y], pos);
@@ -407,6 +428,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if knight piece can move to presented cell
         _.knightMove = (a, b) => {
             let pos = [[a.x-1, a.y-2], [a.x+1, a.y-2], [a.x-1, a.y+2], [a.x+1, a.y+2], [a.x-2, a.y-1], [a.x-2, a.y+1], [a.x+2, a.y+1], [a.x+2, a.y-1]];
 
@@ -417,6 +439,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if bichop piece can move to presented cell
         _.bichopMove = (a, b) => {
             let pos = [],
                 i = 1,
@@ -447,6 +470,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if rook piece can move to presented cell
         _.rookMove = (a, b) => {
             let pos = [],
                 i = 1,
@@ -477,10 +501,12 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if queen piece can move to presented cell
         _.queenMove = (a, b) => {
             return _.rookMove(a, b) || _.bichopMove(a, b)
         };
 
+        // Return if king piece can move to presented cell
         _.kingMove = (a, b, c) => {
             let pos = [[a.x, a.y+1], [a.x+1, a.y+1], [a.x+1, a.y], [a.x+1, a.y-1], [a.x, a.y-1], [a.x-1, a.y-1], [a.x-1, a.y], [a.x-1, a.y+1]];
 
@@ -496,6 +522,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if presented piece can move depending on its type
         _.isForForbidenMoves = (a, b, c, d, e) => {
             // console.log(a, b, c, d, e);
             switch (c) {
@@ -509,6 +536,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Return all available movement for a king
         _.checkKingMovement = (a) => {
             let r = [0, 0];
             this.piecesBoard.forEach((e, i) => {
@@ -552,6 +580,7 @@ this.gref_ = this.gref_ || {};
             return {chec: l.pos, empty: l.empty}
         };
 
+        // Sort nearby pieces list depending on if it's endangering a king or not
         _.sortNearbyPos = (a, b, c) => {
             // console.log("sort nearby", a, b, c);
             this.calls ++;
@@ -569,6 +598,7 @@ this.gref_ = this.gref_ || {};
             return u
         };
 
+        // Sort nearby empty cells list depending on if cell is endangered by opponent pieces or not 
         _.sortEmptyPos = (a, b, c) => {
             // console.log("sort empty");
             // console.log(a, b, c);
@@ -594,6 +624,7 @@ this.gref_ = this.gref_ || {};
             return a
         };
 
+        // Return all pieces around another
         _.getAllArroundPieces = (a) => {
             let pos = [],
                 emptypos = [],
@@ -674,6 +705,7 @@ this.gref_ = this.gref_ || {};
             return {pos: pos, empty: emptypos}
         };
 
+        // Check if one piece move can protect its king
         _.canMoveToProtectKing = (a, b, c) => {
             let o = this.piecesBoard[a.x][a.y],
                 n = this.piecesBoard[b.x][b.y];
@@ -693,10 +725,12 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Check if moving a piece is endangering its king
         _.doesMoveEndangerKing = (a, b, c) => {
             return !_.canMoveToProtectKing(a, b, c);
         };
 
+        // Check if a king can do a castling with its rook
         _.canKingCastling = (a) => {
             let curcoord = _.getCellCoord(a),
             pc = this.piecesBoard[curcoord.x][curcoord.y],
@@ -726,6 +760,7 @@ this.gref_ = this.gref_ || {};
             return (type == "king" && !pc.alreadyMoved && pos.length > 0)
         };
 
+        // Do castling
         _.makeCastling = (a, b) => {
             let an,
                 bn;
@@ -759,13 +794,15 @@ this.gref_ = this.gref_ || {};
                 ro = b,
                 rn = a.x > b.x ? {x: b.x+3, y: b.y} : {x: b.x-2, y: b.y};
             _.pushCastling(ko, kn, ro, rn);
-            _.debugDisplay();
+            _.showPlayerTurn();
         };
 
+        // Check if a pawn as reach opposite border and can get promise
         _.didPawnGetPromise = (a, b) => {
             return (a.y == 0 && this.playerColor == b && this.removedPieces[b].length > 0)
         };
 
+        // Return number a pieces of a player left on the board 
         _.getColorPiecesNumber = (a) => {
             let count = 0;
             this.piecesBoard.forEach((e, i) => {
@@ -777,6 +814,7 @@ this.gref_ = this.gref_ || {};
             return count
         };
 
+        // Place all pieces on UI table and piece board on start
         _.placePieces = (a, b) => {
             Object.keys(a).forEach((e, i) => {
                 let cell = _.getCell(b[i][0], b[i][1]);
@@ -787,6 +825,7 @@ this.gref_ = this.gref_ || {};
             });
         };
 
+        // Generate UI table with cells, piecee board and setup all the listeners for pieces moves
         _.tableGen = () => {
             this.table = _.creatElem({type: "table", attr: {id: "chess_table", class: "chess-table -enter"}});
             this.chessRoot.appendChild(this.table);
@@ -798,9 +837,14 @@ this.gref_ = this.gref_ || {};
                     lc.appendChild(_.creatElem({attr: {class: "cell-content", draggable: true}}));
                     
                     let that = this;
+
+                    /**
+                     *  Drag event
+                     */
+
                     lc.addEventListener('dragstart', function(e) {
                         if (!_.getPlayerTurn(_.getCellCoord(lc))) return
-                        that.currentSelect.classList.remove("-selected");
+                        that.currentSelect && that.currentSelect.classList.remove("-selected");
                         if (_.canKingCastling(lc)) {
                             that.isDoingRock = true;
                         }
@@ -890,11 +934,13 @@ this.gref_ = this.gref_ || {};
             // console.log(this.piecesBoard);
         };
 
+        // Resize UI table
         _.resiseTable = () => {
             let tableSize = Math.min(window.innerWidth, window.innerHeight)*0.95;
             this.table.style.width = this.table.style.height = tableSize+"px";
         };
 
+        // Move a piece
         _.movePiece = (a, b) => {
             // console.log(this.selectedPiece, this.currentSelect);
             if (this.selectedPiece) {
@@ -962,7 +1008,7 @@ this.gref_ = this.gref_ || {};
                     /*
                         Logs
                     */
-                    _.debugDisplay(); // debug only to improve
+                    _.showPlayerTurn(); // debug only to improve
                     console.log(this.piecesBoard);
 
                     console.info("piece moved");
@@ -973,6 +1019,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Check if a king is in checkmate
         _.checkForKingCheck = () => {
             let W = _.checkKingMovement('W'),
                 B = _.checkKingMovement('B'),
@@ -1010,6 +1057,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Update UI window on king checkmate
         _.ischeck = (c, a, b) => {
             if (_.getElemCl("info-window")) {
                 _.getElemCl("info-window").remove();
@@ -1025,6 +1073,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // On end game to stop game
         _.endGame = (a) => {
             this.gamePlaying = false;
             clearInterval(this.playerTimer);
@@ -1038,6 +1087,7 @@ this.gref_ = this.gref_ || {};
             }, "Stay here");
         };
 
+        // Create and show pawn promise UI panel
         _.pawnPromisePanel = (a, b, e, f) => {
             if (this.removedPieces[a]) {
                 let p = _.creatElem({attr: {id: "pawn-promise-panel", class: "pawn-promise-panel"}}),
@@ -1076,6 +1126,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Update remove pieces UI window
         _.updateRemovedPieceDisplay = () => {
             Object.keys(this.removedPieces).forEach((e, i) => {
                 _.getElemCl(e === 'W' ? "w-rm-p" : "b-rm-p").innerHTML = "";
@@ -1088,11 +1139,13 @@ this.gref_ = this.gref_ || {};
             });
         };
 
+        // Clear remove pieces UI window
         _.clearRemovedPieceDisplay = () => {
             _.getElemCl("w-rm-p").innerHTML = "";
             _.getElemCl("b-rm-p").innerHTML = "";
         };
 
+        // Place UI window of removed pieces
         _.placeRemovePrev = () => {
             _.getElemCl("w-rm-p").style = "";
             _.getElemCl("b-rm-p").style = "";
@@ -1105,19 +1158,21 @@ this.gref_ = this.gref_ || {};
             }
         };
         
-        _.debugDisplay = () => {
+        // Pieces appearing animation on start
+        _.showPlayerTurn = () => {
             _.getElemID("turn-window-tt").innerText = (this.playerTurn === 1) ? "White's Turn" : "Black's Turn"
         };
 
-        _.PLayerTurn = (a) => {
-            console.log("player turn");
+        // Setup players and usernames
+        _.PlayerTurn = (a) => {
             this.playerTurn = a.startingPlayer;
             this.gamePlaying = true;
             (this.playerTurn === this.player) && (this.canPlay = true)
             this.opponentUsername = (a.opponentUsername === "" ? (this.player === 1 ? "Player 2" : "Player 1") : a.opponentUsername);
-            _.debugDisplay();
+            _.showPlayerTurn();
         };
 
+        // Pieces appearing animation on start
         _.showPieces = () => {
             let pieces = document.getElementsByClassName('-chess-image'),
                 i = 0;
@@ -1133,6 +1188,7 @@ this.gref_ = this.gref_ || {};
             }, 20);
         };
 
+        // Init the game
         _.initGame = (a, b, c) => {
             this.loader.remove();
             this.isReady = true;
@@ -1169,6 +1225,7 @@ this.gref_ = this.gref_ || {};
             }, 1500);
         };
 
+        // Create and show a custom alert to ask for username
         _.usernamePopup = (t, a) => {
             this.popupAlert && this.popupAlert.remove();
             let l = document.createElement('div');
@@ -1191,6 +1248,7 @@ this.gref_ = this.gref_ || {};
             return l
         };
 
+        // Create and show a loader
         _.addLoader = (r) =>  {
             let a = document.createElement("div");
             a.setAttribute("class", "ad-up-box-loader");
@@ -1200,6 +1258,7 @@ this.gref_ = this.gref_ || {};
             return a;
         }
 
+        // Create and show a custom alert
         _.alertPopup = (t, a, b, c, d) => {
             this.popupAlert && this.popupAlert.remove();
             let l = document.createElement('div');
@@ -1224,6 +1283,7 @@ this.gref_ = this.gref_ || {};
             return l
         }
 
+        // Disconnect player when maximum search opponent time as reach
         _.connectioTimout = () => {
             setTimeout(() => {
                 if (!this.gamePlaying && !this.isReady) {
@@ -1237,6 +1297,7 @@ this.gref_ = this.gref_ || {};
             }, 10000);
         };
 
+        // Create and show a waiting animation when opponent is playing
         _.waitingAnim = () => {
             if (_.getElemID("wait-pan")) {
                 return _.getElemID("wait-pan");
@@ -1250,6 +1311,7 @@ this.gref_ = this.gref_ || {};
             return ld;
         };
 
+        // Initialize game timer
         _.initTimer = () => {
             this.selfTimerCount = 0;
             this.otherTimerCount = 0;
@@ -1265,28 +1327,32 @@ this.gref_ = this.gref_ || {};
             this.player == 2 && (this.waitingPan = _.waitingAnim());
         };
 
+        // Send game update to server via websocket
         _.pushGameChanges = (a, b) => {
             console.log(a);
             this.socket.send(JSON.stringify({changesCoord: {oldCoord: a, newCoord: b}, playerTurn: this.playerTurn, removedPieces: this.removedPieces}));
             this.canPlay = false;
             this.playerTurn = this.playerTurn === 1 ? 2 : 1;
-            _.debugDisplay();
+            _.showPlayerTurn();
             this.waitingPan = _.waitingAnim();
         };
-
+        
+        // Send castling update to server via websocket
         _.pushCastling = (a, b, c, d) => {
             console.log(a);
             this.socket.send(JSON.stringify({castling: {king: {old: a, new: b}, rook: {old: c, new: d}}, playerTurn: this.playerTurn}));
             this.canPlay = false;
             this.playerTurn = this.playerTurn === 1 ? 2 : 1;
-            _.debugDisplay();
+            _.showPlayerTurn();
             this.waitingPan = _.waitingAnim();
         };
 
+        // Send pawn promise update to server via websocket
         _.pushPawnPromise = (a, b) => {
             this.socket.send(JSON.stringify({pawnPromise : {coord: a, piece: b, origin: this.player, removedPieces: this.removedPieces}}));
         };
 
+        // Update UI on pawn promise update receive
         _.updateFromPromise = (a) => {
             _.ischeck();
             console.log(a);
@@ -1303,6 +1369,7 @@ this.gref_ = this.gref_ || {};
             _.checkForKingCheck();
         };
 
+        // Update UI on game update receive
         _.updateChanges = (a) => {
             _.ischeck();
             console.log(a);
@@ -1340,11 +1407,12 @@ this.gref_ = this.gref_ || {};
             this.removedPieces = a.removedPieces;
             _.updateRemovedPieceDisplay();
 
-            _.debugDisplay(); // debug only to improve
+            _.showPlayerTurn(); // debug only to improve
             _.checkForKingCheck();
             console.log(this.piecesBoard);
         };
 
+        // Update UI on castling update receive
         _.updateCastling = (a) => {
             _.ischeck();
             console.log(a);
@@ -1392,11 +1460,12 @@ this.gref_ = this.gref_ || {};
 
             console.log(this.playerTurn, this.canPlay);
 
-            _.debugDisplay(); // debug only to improve
+            _.showPlayerTurn(); // debug only to improve
             _.checkForKingCheck();
             console.log(this.piecesBoard);
         };
 
+        // Disconnect player on opponent disconnection
         _.onUserDisconnecion = () => {
             this.table && this.table.remove();
             this.waitingPan && this.waitingPan.remove();
@@ -1411,6 +1480,7 @@ this.gref_ = this.gref_ || {};
             }, "Wait here");
         };
 
+        // Open a WebSocket to create a connection with another player and setup WS events
         _.openWS = () => {
             console.log("ws://"+location.hostname+":8080");
             document.body.classList.add("-online");
@@ -1431,11 +1501,10 @@ this.gref_ = this.gref_ || {};
                     console.log(msg);
 
                     if (msg.player) _.initGame(msg.player1Color, msg.player2Color, msg.player);
-                    if (msg.startingPlayer) _.PLayerTurn(msg), _.initTimer();
+                    if (msg.startingPlayer) _.PlayerTurn(msg), _.initTimer();
                     if (msg.gameStart) {
                         (this.popupAlert || (this.popupAlert = _.getElemID("ad-error-pn-c"))) && this.popupAlert.remove();
                     }
-
                     if (msg.changesCoord) {
                         _.updateChanges(msg); 
                         this.waitingPan && this.waitingPan.remove();
@@ -1463,6 +1532,7 @@ this.gref_ = this.gref_ || {};
             _.closeGame();
         };
 
+        // Home button
         _.closeGame = () => {
             _.getElemID("close-btn").onclick = () => {
                 let mess = this.isReady ? "You are going to leave the game. There is no way back." : "You are about to stop player search."

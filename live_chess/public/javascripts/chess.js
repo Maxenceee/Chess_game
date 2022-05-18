@@ -1,5 +1,7 @@
 this.gref_ = {
+    // UI elements
     CONFIG: [["app-root"], [], []],
+    // Game pieces as objects
     PIECES: {
         W: {
             WRook1: {
@@ -273,18 +275,22 @@ this.gref_ = this.gref_ || {};
         "use strict";
         var Kr, Kd, Km;
         var PW, PB;
+        // Parsing UI as var
         _ && _.CONFIG ? (Kd = _.CONFIG[0], Kr = _.CONFIG[1], Km = _.CONFIG[2]) || {} : (Kr = [], Kd = [], Km = []);
         _ && _.PIECES ? (PW = _.PIECES.W, PB = _.PIECES.B) : (PW = {}, PB = {});
         console.log(_, Kd, Kr, Km, PW, PB);
 
+        // Return document element by id
         _.getElemID = (a) => {
             return document.getElementById(a);
         };
-
+        
+        // Return document element by class
         _.getElemCl = (a) => {
             return document.getElementsByClassName(a)[0];
         };
 
+        // Create document element with custom attributes
         _.creatElem = ({type="div", attr="class", naAttr}={}) => {
             let e = document.createElement(type);
 
@@ -294,6 +300,7 @@ this.gref_ = this.gref_ || {};
             return e
         };
 
+        // Define several attributes on element
         _.defAttr = (a, b) => {
             (a && b) && Object.keys(b).forEach(attr => {
                 a.setAttribute(attr, b[attr]);
@@ -301,6 +308,7 @@ this.gref_ = this.gref_ || {};
             return a
         };
 
+        // Return cell element by coords
         _.getCell = (x, y) => {
             let fy = document.querySelectorAll('[celly="'+y+'"]');
             return Array.prototype.filter.call(fy, function( node ) {
@@ -308,46 +316,55 @@ this.gref_ = this.gref_ || {};
             })[0];
         };
 
+        // Return cell element coords
         _.getCellCoord = (a) => {
             return {x: parseInt(a.getAttribute("cellx")), y: parseInt(a.getAttribute("celly"))}
         };
 
+        // Return background table cell color
         _.lps = (a, b) => {
             return ((a+b) % 2 == 0 ? "cell_1" : "cell_2") + " chess-cell"
         };
 
+        // Define cell element background image
         _.defChessImage = (a, b) => {
             a.querySelector('.cell-content').style.backgroundImage = 'url(/images/'+b+')';
             a.classList.add("-chess-image");
             a.setAttribute("ispiece", true);
         };
-
+        
+        // Remove cell element background image
         _.remChessImage = (a) => {
             a.querySelector('.cell-content').style.backgroundImage = "";
             a.classList.remove("-chess-image");
             a.setAttribute("ispiece", false);
         };
 
+        // Check if two cells are the same
         _.isSameCell = (a, b) => {
             return (a.x === b.x && a.y === b.y)
         };
 
+        // Check if a cell is empty
         _.isEmpty = (a) => {
             return (this.piecesBoard[a.x][a.y] === 0)
         };
 
+        // Check if cell can be eat
         _.isEating = (a, b) => {
             return (this.piecesBoard[a.x][a.y].color !== this.piecesBoard[b.x][b.y].color) && this.piecesBoard[b.x][b.y].type !== "king"
         };
 
+        // Check if presented piece is one of playing player
         _.getPlayerTurn = (a) => {
-            return (typeof this.piecesBoard[a.x][a.y] === "object" ? ((this.piecesBoard[a.x][a.y].color === 'W' && this.isWTurn) || (this.piecesBoard[a.x][a.y].color === 'B' && !this.isWTurn)) : undefined)
+            return (typeof this.piecesBoard[a.x][a.y] === "object" ? ((this.piecesBoard[a.x][a.y].color === 'W' && this.isWTurn) || (this.piecesBoard[a.x][a.y].color === 'B' && !this.isWTurn)) : false)
         };
 
+        // Check if a king can eat a cell without endangering himself
         _.eatingWhenKing = (a, b, c) => {
             // console.log("eatingWhenKing", a, b, c);
             
-            let l = _.getAllArroundPieces(b);
+            let l = _.getAllAroundPieces(b);
 
             l.pos = _.sortNearbyPos(l.pos, b, this.piecesBoard[a.x][a.y].color);
 
@@ -356,11 +373,13 @@ this.gref_ = this.gref_ || {};
             return (!_.isSameCell(a, b) && c === 'king' && _.canKingEatCell(a, b) && l.pos.length <= 0)
         };
 
+        // Check if a king can eat a cell
         _.canKingEatCell = (a, b) => {
             return _.kingMove(a, b, true) && this.piecesBoard[a.x][a.y].color !== this.piecesBoard[b.x][b.y].color && !_.isEmpty(b)
         };
 
-        _.canKingEatArround = (b) => {
+        // Check if a king as eatable cells around
+        _.canKingEatAround = (b) => {
             let a;
             this.piecesBoard.forEach((e, i) => {
                 e.forEach((u, v) => {
@@ -383,9 +402,10 @@ this.gref_ = this.gref_ || {};
             return r.length > 0
         };
 
+        // Return if pawn piece can move to presented cell
         _.pawnMove = (a, b, c) => {
-            let d = (c && 1) || -1
-            let pos = [];
+            let d = (c && 1) || -1,
+                pos = [];
             (this.piecesBoard[a.x][a.y].alreadyMoved == false && this.piecesBoard[a.x][a.y].type == "pawn") && pos.push([a.x, a.y+(c ? 2 : -2)]);
 
             // console.log(this.piecesBoard[a.x][a.y], pos);
@@ -403,6 +423,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if knight piece can move to presented cell
         _.knightMove = (a, b) => {
             let pos = [[a.x-1, a.y-2], [a.x+1, a.y-2], [a.x-1, a.y+2], [a.x+1, a.y+2], [a.x-2, a.y-1], [a.x-2, a.y+1], [a.x+2, a.y+1], [a.x+2, a.y-1]];
 
@@ -413,6 +434,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if bichop piece can move to presented cell
         _.bichopMove = (a, b) => {
             let pos = [],
                 i = 1,
@@ -443,6 +465,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if rook piece can move to presented cell
         _.rookMove = (a, b) => {
             let pos = [],
                 i = 1,
@@ -473,10 +496,12 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if queen piece can move to presented cell
         _.queenMove = (a, b) => {
             return _.rookMove(a, b) || _.bichopMove(a, b)
         };
 
+        // Return if king piece can move to presented cell
         _.kingMove = (a, b, c) => {
             let pos = [[a.x, a.y+1], [a.x+1, a.y+1], [a.x+1, a.y], [a.x+1, a.y-1], [a.x, a.y-1], [a.x-1, a.y-1], [a.x-1, a.y], [a.x-1, a.y+1]];
 
@@ -492,6 +517,7 @@ this.gref_ = this.gref_ || {};
             return pos.length > 0
         };
 
+        // Return if presented piece can move depending on its type
         _.isForForbidenMoves = (a, b, c, d, e) => {
             // console.log(a, b, c, d, e);
             switch (c) {
@@ -505,6 +531,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Return all available movement for a king
         _.checkKingMovement = (a) => {
             let r = [0, 0];
             this.piecesBoard.forEach((e, i) => {
@@ -522,7 +549,7 @@ this.gref_ = this.gref_ || {};
 
             // console.log("r", r, a);
 
-            let l = _.getAllArroundPieces({x: r[0], y: r[1]});
+            let l = _.getAllAroundPieces({x: r[0], y: r[1]});
 
             // console.log(l);
 
@@ -548,23 +575,24 @@ this.gref_ = this.gref_ || {};
             return {chec: l.pos, empty: l.empty}
         };
 
+        // Sort nearby pieces list depending on if it's endangering a king or not
         _.sortNearbyPos = (a, b, c) => {
             // console.log("sort nearby", a, b, c);
-            this.calls ++;
             
             let u = [];
             a.forEach(e => {
                 let col = this.piecesBoard[e[0]][e[1]].color,
-                    pieceType = this.piecesBoard[e[0]][e[1]].type,
-                    typrev = (pieceType === 'pawn' && col === 'W') ? true : false;
+                pieceType = this.piecesBoard[e[0]][e[1]].type,
+                typrev = (pieceType === 'pawn' && col === 'W') ? true : false;
                 // console.log(col, typrev, col != c, _.isForForbidenMoves(b, {x: e[0], y: e[1]}, this.piecesBoard[e[0]][e[1]].type, typrev));
                 // console.log(e, this.piecesBoard[e[0]][e[1]], c, _.isForForbidenMoves(b, {x: e[0], y: e[1]}, this.piecesBoard[e[0]][e[1]].type, typrev));
                 if ((col != c) && _.isForForbidenMoves(b, {x: e[0], y: e[1]}, this.piecesBoard[e[0]][e[1]].type, typrev, pieceType == 'king')) u.push(e);
             });
-
+            
             return u
         };
-
+        
+        // Sort nearby empty cells list depending on if cell is endangered by opponent pieces or not 
         _.sortEmptyPos = (a, b, c) => {
             // console.log("sort empty");
             // console.log(a, b, c);
@@ -572,8 +600,8 @@ this.gref_ = this.gref_ || {};
 
             a.forEach(e => {
                 // console.log(e);
-                let l = _.getAllArroundPieces({x: e[0], y: e[1]});
-                // console.log(_.getAllArroundPieces({x: e[0], y: e[1]}), l);
+                let l = _.getAllAroundPieces({x: e[0], y: e[1]});
+                // console.log(_.getAllAroundPieces({x: e[0], y: e[1]}), l);
 
                 l.pos = _.sortNearbyPos(l.pos, {x: e[0], y: e[1]}, c);
                 
@@ -590,7 +618,8 @@ this.gref_ = this.gref_ || {};
             return a
         };
 
-        _.getAllArroundPieces = (a) => {
+        // Return all pieces around another
+        _.getAllAroundPieces = (a) => {
             let pos = [],
                 emptypos = [],
                 np = [[a.x-1, a.y-2], [a.x+1, a.y-2], [a.x-1, a.y+2], [a.x+1, a.y+2], [a.x-2, a.y-1], [a.x-2, a.y+1], [a.x+2, a.y+1], [a.x+2, a.y-1]],
@@ -670,6 +699,7 @@ this.gref_ = this.gref_ || {};
             return {pos: pos, empty: emptypos}
         };
 
+        // Check if one piece move can protect its king
         _.canMoveToProtectKing = (a, b, c) => {
             let o = this.piecesBoard[a.x][a.y],
                 n = this.piecesBoard[b.x][b.y];
@@ -689,10 +719,12 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Check if moving a piece is endangering its king
         _.doesMoveEndangerKing = (a, b, c) => {
             return !_.canMoveToProtectKing(a, b, c);
         };
 
+        // Check if a king can do a castling with its rook
         _.canKingCastling = (a) => {
             let curcoord = _.getCellCoord(a),
             pc = this.piecesBoard[curcoord.x][curcoord.y],
@@ -722,6 +754,7 @@ this.gref_ = this.gref_ || {};
             return (type == "king" && !pc.alreadyMoved && pos.length > 0)
         };
 
+        // Do castling
         _.makeCastling = (a, b) => {
             let an,
                 bn;
@@ -750,9 +783,10 @@ this.gref_ = this.gref_ || {};
             this.piecesBoard[b.x][b.y] = 0;
 
             this.isWTurn = !this.isWTurn;
-            _.debugDisplay();
+            _.showPlayerTurn();
         };
 
+        // Return number a pieces of a player left on the board 
         _.getColorPiecesNumber = (a) => {
             let count = 0;
             this.piecesBoard.forEach((e, i) => {
@@ -764,6 +798,7 @@ this.gref_ = this.gref_ || {};
             return count
         };
  
+        // Check if a pawn as reach opposite border and can get promise
         _.didPawnGetPromise = (a, b) => {
             if (a.y == 0 && b == 'W') {
                 console.log("white promise");
@@ -774,6 +809,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Place all pieces on UI table and piece board on start
         _.placePieces = (a) => {
             Object.keys(a).forEach((e, i) => {
                 let cell = _.getCell(a[e].position[0], a[e].position[1]);
@@ -784,6 +820,7 @@ this.gref_ = this.gref_ || {};
             });
         };
 
+        // Generate UI table with cells, piecee board and setup all the listeners for pieces moves
         _.tableGen = () => {
             this.table = _.creatElem({type: "table", attr: {id: "chess_table", class: "chess-table -enter"}});
             this.chessRoot.appendChild(this.table);
@@ -795,9 +832,14 @@ this.gref_ = this.gref_ || {};
                     lc.appendChild(_.creatElem({attr: {class: "cell-content", draggable: true}}));
                     // lc.ondragstart = _.onPieceDrag();
                     let that = this;
+
+                    /**
+                     *  Drag event
+                     */
+
                     lc.addEventListener('dragstart', function(e) {
                         if (!_.getPlayerTurn(_.getCellCoord(lc))) return
-                        that.currentSelect.classList.remove("-selected");
+                        that.currentSelect && that.currentSelect.classList.remove("-selected");
                         if (_.canKingCastling(lc)) {
                             that.isDoingRock = true;
                         }
@@ -882,11 +924,13 @@ this.gref_ = this.gref_ || {};
             // console.log(this.piecesBoard);
         };
 
+        // Resize UI table
         _.resiseTable = () => {
             let tableSize = Math.min(window.innerWidth, window.innerHeight)*0.95;
             this.table.style.width = this.table.style.height = tableSize+"px";
         };
 
+        // Move a piece
         _.movePiece = (a, b) => {
             // console.log(this.selectedPiece, this.currentSelect);
             if (this.selectedPiece) {
@@ -912,15 +956,12 @@ this.gref_ = this.gref_ || {};
                     } else {
                         console.info("does protect king");
                     }
-                    // return
                 }
 
                 if (kingM.chec.length <= 0 && pieceType != 'king' && _.doesMoveEndangerKing(oldCell, newCell, this.piecesBoard[oldCell.x][oldCell.y].color)) {
                     console.info("put king in danger");
                     return
                 }
-
-                console.log(this.calls);
 
                 // if (kingM.chec.length) return
                 // console.log("move");
@@ -945,7 +986,7 @@ this.gref_ = this.gref_ || {};
                     /*
                         Logs
                     */
-                    _.debugDisplay(); // debug only to improve
+                    _.showPlayerTurn(); // debug only to improve
                     console.log(this.piecesBoard);
 
                     console.info("piece moved");
@@ -957,11 +998,12 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Check if a king is in checkmate
         _.checkForKingCheck = () => {
             let W = _.checkKingMovement('W'),
                 B = _.checkKingMovement('B'),
-                eW = _.canKingEatArround('W'),
-                eB = _.canKingEatArround('B');
+                eW = _.canKingEatAround('W'),
+                eB = _.canKingEatAround('B');
             // console.log("W", W, "B", B);
 
             console.log(eW, eB);
@@ -975,13 +1017,11 @@ this.gref_ = this.gref_ || {};
             if (W.chec.length > 0 && W.empty.length <= 0 && !eW) {
                 console.info("check mate W");
                 this.gamePlaying = false;
-                // alert("Black Player Win");
                 _.ischeck(W.chec, "W", true);
                 _.endGame('W');
             } else if (B.chec.length > 0 && B.empty.length <= 0 && !eB) {
                 console.info("check mate B");
                 this.gamePlaying = false;
-                // alert("White Player Win");
                 _.ischeck(B.chec, "B", true);
                 _.endGame('B');
             } else if (W.chec.length > 0) {
@@ -996,6 +1036,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Update UI window on king checkmate
         _.ischeck = (c, a, b) => {
             if (_.getElemCl("info-window")) {
                 _.getElemCl("info-window").remove();
@@ -1011,6 +1052,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // On end game to stop game
         _.endGame = (a) => {
             this.gamePlaying = false;
             clearInterval(this.playerTimer);
@@ -1024,6 +1066,7 @@ this.gref_ = this.gref_ || {};
             }, "Stay here");
         };
 
+        // Place UI window of removed pieces
         _.placeRemovePrev = () => {
             _.getElemCl("w-rm-p").style = "";
             _.getElemCl("b-rm-p").style = "";
@@ -1036,6 +1079,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Initialize game timer
         _.initTimer = () => {
             this.selfTimerCount = 0;
             this.otherTimerCount = 0;
@@ -1050,6 +1094,7 @@ this.gref_ = this.gref_ || {};
             }, 1000);
         };
 
+        // Create and show pawn promise UI panel
         _.pawnPromisePanel = (a, b) => {
             if (this.removedPieces[a]) {
                 let p = _.creatElem({attr: {id: "pawn-promise-panel", class: "pawn-promise-panel"}}),
@@ -1084,6 +1129,7 @@ this.gref_ = this.gref_ || {};
             }
         };
 
+        // Update remove pieces UI window
         _.updateRemovedPieceDisplay = () => {
             Object.keys(this.removedPieces).forEach((e, i) => {
                 _.getElemCl(e === 'W' ? "w-rm-p" : "b-rm-p").innerHTML = "";
@@ -1096,10 +1142,12 @@ this.gref_ = this.gref_ || {};
             });
         };
 
-        _.debugDisplay = () => {
+        // Update UI window on player turn changes
+        _.showPlayerTurn = () => {
             _.getElemID("turn-window-tt").innerText = this.isWTurn ? "White's Turn" : "Black's Turn"
         };
 
+        // Pieces appearing animation on start
         _.showPieces = () => {
             let pieces = document.getElementsByClassName('-chess-image'),
                 i = 0;
@@ -1108,7 +1156,7 @@ this.gref_ = this.gref_ || {};
                 if (i >= Object.getOwnPropertyNames(PW).length+Object.getOwnPropertyNames(PB).length) {
                     clearInterval(linterval);
                     this.gamePlaying = true;
-                    _.debugDisplay();
+                    _.showPlayerTurn();
                     return;
                 };
 
@@ -1117,6 +1165,7 @@ this.gref_ = this.gref_ || {};
             }, 20);
         };
 
+        // Init the game
         _.init = () => {
             this.chessRoot = _.getElemID(Kd[0]);
             this.selectedPiece = false;
@@ -1125,7 +1174,6 @@ this.gref_ = this.gref_ || {};
             this.gamePlaying = false;
             this.removedPieces = {W: [], B: []};
 
-            this.calls = 0;
             this.timerPan = _.getElemID("play-timer");
 
             _.tableGen();
@@ -1145,6 +1193,7 @@ this.gref_ = this.gref_ || {};
             _.closeGame();
         };
 
+        // Create and show a custom alert
         _.alertPopup = (t, a, b, c, d) => {
             this.popupAlert && this.popupAlert.remove();
             let l = document.createElement('div');
@@ -1169,6 +1218,7 @@ this.gref_ = this.gref_ || {};
             return l
         }
 
+        // Home button
         _.closeGame = () => {
             _.getElemID("close-btn").onclick = () => {
                 this.popupAlert = _.alertPopup("You are going to leave the game.", "Leave", function() {
