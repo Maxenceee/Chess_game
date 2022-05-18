@@ -17,7 +17,7 @@ After installing the dependencies, start the project by running :
 npm start
 ```
 
-App will be available on localhost at specified port in the bin/www file (> defaultPort)
+App will be available on localhost at specified port in the bin/www file (bin/www > defaultPort)
 
 ## Multiplayer
 
