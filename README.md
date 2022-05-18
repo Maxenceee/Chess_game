@@ -1,4 +1,4 @@
-# Chess_game
+# Chess Game
 
 Simple chess game in full JS
 
