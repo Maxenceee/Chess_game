@@ -21,9 +21,9 @@ App will be available on localhost at specified port in the bin/www file (> defa
 
 ## Multiplayer
 
-Multiplayer websocket server will automaticaly start on port 8080
+Multiplayer WebSocket server will automaticaly start on port 8080
 
-Multiple games can be played at the same time, players are automatically matched
+Multiple games can be played in the same time, players are automatically matched
 
 ## Note 
 
