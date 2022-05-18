@@ -1,5 +1,7 @@
 # Chess_game
 
+Simple chess game in full JS
+
 You can use this project on localhost or on a node.js server to use it online
 ## Usage
 
