@@ -433,6 +433,20 @@ body {
 	align-items: center;
 }
 
+.wait-word {
+	margin: 20px 0 0;
+	position: relative;
+	text-align: center;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.wait-word > div:first-child {
+	margin-right: 30px;
+	color: #FFF;
+}
+
 .info-window {
 	background-color: var(--cf-red-3);
 }
@@ -598,6 +612,7 @@ body {
     display: -webkit-flex;
     justify-content: center;
     align-items: center;
+	flex-direction: column;
 }
 
 .loader {
@@ -628,7 +643,7 @@ body {
 .path {
     stroke-dasharray: 1, 200;
     stroke-dashoffset: 0;
-    animation: dash 1.5s ease-in-out infinite, color 6s ease-in-out infinite;
+    animation: dash 1.5s ease-in-out infinite, color 8s ease-in-out infinite;
     stroke-linecap: round;
 }
   
@@ -656,17 +671,17 @@ body {
 @keyframes color {
     100%,
     0% {
-      stroke: #d62d20;
+      stroke: #ffbdb8;
     }
     40% {
-      stroke: #0057e7;
+      stroke: #b9d2fb;
     }
     66% {
-      stroke: #008744;
+      stroke: #bdffde;
     }
     80%,
     90% {
-      stroke: #ffa700;
+      stroke: #ffe6b7;
     }
 }
 

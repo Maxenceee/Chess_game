@@ -1249,11 +1249,18 @@ this.gref_ = this.gref_ || {};
         };
 
         // Create and show a loader
-        _.addLoader = (r) =>  {
+        _.addLoader = (r, u) =>  {
             let a = document.createElement("div");
             a.setAttribute("class", "ad-up-box-loader");
             a.innerHTML = '<div class="loader"><svg class="circular" viewBox="25 25 50 50"><circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="5" stroke-miterlimit="10"/></svg></div>';
-
+            if (u) {
+                let b = _.creatElem({type: "h1", naAttr: "wait-word"}),
+                    c = _.creatElem({});
+                c.innerText = "Searching for opponent";
+                b.appendChild(c);
+                b.appendChild(_.creatElem({naAttr: "dot-typing"}));
+                a.appendChild(b);
+            }
             r.appendChild(a);
             return a;
         }
@@ -1487,7 +1494,7 @@ this.gref_ = this.gref_ || {};
             this.socket = new WebSocket("ws://"+location.hostname+":8080");
 
             this.chessRoot = _.getElemID(Kd[0]);
-            this.loader = _.addLoader(this.chessRoot);
+            this.loader = _.addLoader(this.chessRoot, true);
 
             this.socket.onopen = () => {
                 console.log("connection open");

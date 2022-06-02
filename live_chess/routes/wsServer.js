@@ -98,7 +98,7 @@ async function getOpponent(a) {
             }
         });
 
-        return response !== 0 ? response : a
+        return response !== 0 ? null : a
     } catch (error) {
         console.info(error);
     }
@@ -118,7 +118,7 @@ async function clientByOpponent(a) {
             }
         });
 
-        return response === 0 ? false : response
+        return response === 0 ? null : response
     } catch (error) {
         console.info(error);
     }
