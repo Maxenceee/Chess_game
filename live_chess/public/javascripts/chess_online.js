@@ -1,3 +1,12 @@
+/**!
+ *
+ * 
+ * 
+ * This program is a chess game to play online games
+ * 
+ * 
+ */
+
 this.gref_ = {
     // UI elements
     CONFIG: [["app-root"], [], []],

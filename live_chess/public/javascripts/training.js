@@ -2,10 +2,12 @@
  *
  * 
  * 
- * This program is a chess game to play local games
+ * This program is a chess game with ai opponent with training purpose
  * 
  * 
  */
+
+// Program based on chess.js recoded in OOP (not finish)
 
 this.gref_ = {
     // UI elements
@@ -833,11 +835,12 @@ this.gref_ = this.gref_ || {};
         _.tableGen = () => {
             this.table = _.creatElem({type: "table", attr: {id: "chess_table", class: "chess-table -enter"}});
             this.chessRoot.appendChild(this.table);
+            let idx = 0;
 
             for(var i = 0, le; i < 8; i++) {
                 le = _.creatElem({type: "tr", attr: {id: "table_row_"+i, class: "table-row"}});
                 for(var j = 0; j < 8; j++) {
-                    let lc = _.creatElem({type: "td", attr: {id: "cell_"+j+"_"+i, class: _.lps(i, j), cellx: j, celly: i, ispiece: false}});
+                    let lc = _.creatElem({type: "td", attr: {id: "cell_"+j+"_"+i, class: _.lps(i, j), cellx: j, celly: i, ispiece: false, cellIndex: idx}});
                     lc.appendChild(_.creatElem({attr: {class: "cell-content", draggable: true}}));
                     // lc.ondragstart = _.onPieceDrag();
                     let that = this;
@@ -916,6 +919,7 @@ this.gref_ = this.gref_ || {};
                     });
 
                     le.appendChild(lc);
+                    idx++;
                 }
                 this.table.appendChild(le);
             }

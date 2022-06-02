@@ -19,6 +19,10 @@ this.ref_ = this.ref_ || {};
                     document.querySelectorAll('.home-btn').forEach(e => e.classList.add("-leaving"));
                     setTimeout(() => { window.location.href = "solo?type=online"; }, 500);
                 }
+                _.getElemID('training').onclick = () => {
+                    document.querySelectorAll('.home-btn').forEach(e => e.classList.add("-leaving"));
+                    setTimeout(() => { window.location.href = "solo?type=training"; }, 500);
+                }
 
             }, 1000);
         };
