@@ -94,11 +94,11 @@ async function getOpponent(a) {
             if (foundId >= 0) {
                 resolve(CLIENTS[foundId]);
             } else {
-                reject(0);
+                reject(null);
             }
         });
 
-        return response !== 0 ? null : a
+        return response
     } catch (error) {
         console.info(error);
     }
@@ -114,11 +114,11 @@ async function clientByOpponent(a) {
             if (foundId >= 0) {
                 resolve(CLIENTS[foundId]);
             } else {
-                reject(0);
+                reject(null);
             }
         });
 
-        return response === 0 ? null : response
+        return response
     } catch (error) {
         console.info(error);
     }
