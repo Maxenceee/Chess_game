@@ -1505,6 +1505,13 @@ this.gref_ = this.gref_ || {};
             console.log(this.piecesBoard);
         };
 
+        _.bindPort = (a, b) => {
+            if (!isNaN(parseInt(b))) {
+                return a+':'+b;
+            }
+            return b+'.'+a;
+        }
+
         // Disconnect player on opponent disconnection
         _.onUserDisconnecion = () => {
             this.table && this.table.remove();
@@ -1522,9 +1529,14 @@ this.gref_ = this.gref_ || {};
 
         // Open a WebSocket to create a connection with another player and setup WS events
         _.openWS = () => {
-            console.log("ws://"+location.hostname+":8080");
             document.body.classList.add("-online");
-            this.socket = new WebSocket("ws://"+location.hostname+":8080");
+            let sp = "8080",
+			    sd = "chess-ws",
+			    hr = "maxencegama.dev";
+		    let WSProtocol = (location.protocol === 'https:') ? 'wss:' : 'ws:',
+			    WSHost = (location.hostname === 'localhost') ? _.bindPort(location.hostname, sp) : _.bindPort(hr, sd);
+            console.log("ws://"+location.hostname+":8080");
+            this.socket = new WebSocket(WSProtocol+"//"+WSHost);
 
             this.chessRoot = _.getElemID(Kd[0]);
             this.loader = _.addLoader(this.chessRoot, true);
