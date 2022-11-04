@@ -1223,8 +1223,24 @@ this.gref_ = this.gref_ || {};
                 _.placePieces(PB);
 
                 _.showPieces();
-                _.initTimer();
-                _.placeRemovePrev();
+                // _.initTimer();
+                // _.placeRemovePrev();
+
+                /*
+                developpement message
+                */
+               
+                setTimeout(() => {
+                    _.alertPopup("This feature is not available. Local game will start.", "Leave", function() {
+                        document.body.classList.add("-leaving");
+                        setTimeout(() => {
+                            window.location.href = "/";
+                        }, 500);
+                    }.bind(this), "Stay here", function() {
+                        _.initTimer();
+                        _.placeRemovePrev();
+                    });
+                }, 1000);
             }, 1500);
 
             _.closeGame();
