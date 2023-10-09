@@ -4,6 +4,8 @@ Simple chess game fully in Vanilla Javascript and running on Node.JS server.
 
 You can use this project on localhost or on a Node.js server to use it online.
 
+[Try it here!](https://chess.maxencegama.dev)
+
 ## Usage
 
 Clone this project and open the 'live_chess' directory into a terminal, then install dependencies by running:
